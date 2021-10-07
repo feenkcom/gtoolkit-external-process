@@ -8,7 +8,7 @@ Compile or download a released shared library for your platform from https://git
 
 ```smalltalk
 Metacello new
-   baseline: 'LepiterApp';
+   baseline: 'GToolkitExternalProcess';
    repository: 'github://feenkcom/gtoolkit-external-process:main/src';
    load.
 ```
