@@ -44,15 +44,28 @@ GtExternalProcessBuilder >> createNativeCommand [
 	anExternalCommand := GtNativeExternalProcessCommand new: self command.
 	arguments do: [ :eachArgument | anExternalCommand arg: eachArgument ].
 	stdout applyOnStdoutOf: anExternalCommand.
+	stderr applyOnStderrOf: anExternalCommand.
 
 	^ anExternalCommand
+]
+
+{ #category : #accessing }
+GtExternalProcessBuilder >> inheritStderr [
+	stderr := GtExternalProcessInheritedStdio new
+]
+
+{ #category : #accessing }
+GtExternalProcessBuilder >> inheritStdout [
+	stdout := GtExternalProcessInheritedStdio new
 ]
 
 { #category : #initialization }
 GtExternalProcessBuilder >> initialize [
 	super initialize.
 	
-	arguments := OrderedCollection new
+	arguments := OrderedCollection new.
+	stdout := GtExternalProcessInheritedStdio new.
+	stderr := GtExternalProcessInheritedStdio new
 ]
 
 { #category : #'api - spawning' }

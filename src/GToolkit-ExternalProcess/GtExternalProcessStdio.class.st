@@ -5,5 +5,9 @@ Class {
 }
 
 { #category : #dispatch }
+GtExternalProcessStdio >> applyOnStderrOf: aGtNativeExternalCommand [
+]
+
+{ #category : #dispatch }
 GtExternalProcessStdio >> applyOnStdoutOf: aGtNativeExternalCommand [
 ]

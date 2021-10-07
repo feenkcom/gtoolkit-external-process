@@ -32,6 +32,24 @@ GtNativeExternalAsynchronousBuffer >> pollString [
 		during: [ :aGtBoxerString | aGtBoxerString string ]
 ]
 
+{ #category : #'api - buffer' }
+GtNativeExternalAsynchronousBuffer >> pollStringEvery: aDuration do: aBlock [
+	^ [ 
+		| shouldStop |
+		
+		shouldStop := false.
+		[ shouldStop not ] whileTrue: [
+			| aPolledString |
+
+			aPolledString := self pollString.
+			aPolledString ifEmpty: [
+				childProcess isTerminated
+					ifTrue: [ shouldStop := true ] ]
+				ifNotEmpty: [ :aString | aBlock value: aString ].
+			aDuration wait ].
+	] fork
+]
+
 { #category : #'private - ffi' }
 GtNativeExternalAsynchronousBuffer >> primPollString [
 	^ self ffiCall: #(void* process_async_buffer_poll_string(self))

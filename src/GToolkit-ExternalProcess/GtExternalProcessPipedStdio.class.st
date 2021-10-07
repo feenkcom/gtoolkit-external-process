@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #dispatch }
+GtExternalProcessPipedStdio >> applyOnStderrOf: aGtNativeExternalCommand [
+	aGtNativeExternalCommand pipeStderr
+]
+
+{ #category : #dispatch }
 GtExternalProcessPipedStdio >> applyOnStdoutOf: aGtNativeExternalCommand [
 	aGtNativeExternalCommand pipeStdout
 ]

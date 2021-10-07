@@ -36,6 +36,21 @@ GtNativeExternalProcessCommand >> arg: anArgument [
 ]
 
 { #category : #'api - command' }
+GtNativeExternalProcessCommand >> inheritStderr [
+	self primInheritStderr
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> inheritStdin [
+	self primInheritStdin
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> inheritStdout [
+	self primInheritStdout
+]
+
+{ #category : #'api - command' }
 GtNativeExternalProcessCommand >> output [
 	^ GtNativeExternalProcessOutput fromNativeHandle: self primOutput
 ]
@@ -58,6 +73,21 @@ GtNativeExternalProcessCommand >> pipeStdout [
 { #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primArg: aGtBoxerString [
 	^ self ffiCall: #(void process_command_arg(self, GtBoxerString aGtBoxerString))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primInheritStderr [
+	^ self ffiCall: #(void process_command_inherit_stderr(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primInheritStdin [
+	^ self ffiCall: #(void process_command_inherit_stdin(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primInheritStdout [
+	^ self ffiCall: #(void process_command_inherit_stdout(self))
 ]
 
 { #category : #'private - ffi' }

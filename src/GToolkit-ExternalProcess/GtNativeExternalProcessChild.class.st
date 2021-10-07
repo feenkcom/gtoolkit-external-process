@@ -31,6 +31,11 @@ GtNativeExternalProcessChild >> id [
 	^ self primId
 ]
 
+{ #category : #testing }
+GtNativeExternalProcessChild >> isTerminated [
+	^ self primIsTerminated
+]
+
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> kill [
 	^ self primKill
@@ -39,6 +44,11 @@ GtNativeExternalProcessChild >> kill [
 { #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primId [
 	^ self ffiCall: #(uint32 process_child_id(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primIsTerminated [
+	^ self ffiCall: #(bool process_child_is_terminated(self))
 ]
 
 { #category : #'private - ffi' }
