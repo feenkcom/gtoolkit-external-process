@@ -1,57 +1,57 @@
 Class {
-	#name : #GtNatoveExternalProcessOutput,
+	#name : #GtNativeExternalProcessOutput,
 	#superclass : #GtBoxerValueBox,
 	#category : #'GToolkit-ExternalProcess-External'
 }
 
 { #category : #'library path' }
-GtNatoveExternalProcessOutput class >> ffiLibraryName [
+GtNativeExternalProcessOutput class >> ffiLibraryName [
 	^ GtExternalProcessLibrary
 ]
 
 { #category : #'private - ffi' }
-GtNatoveExternalProcessOutput class >> primRelease: aHandle [
+GtNativeExternalProcessOutput class >> primRelease: aHandle [
 	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
 	^ self ffiCall: #(void process_output_drop(void** aHandle))
 ]
 
 { #category : #'private - ffi' }
-GtNatoveExternalProcessOutput >> primtGetStderr [
+GtNativeExternalProcessOutput >> primtGetStderr [
 	^ self ffiCall: #(void* process_output_stderr(self))
 ]
 
 { #category : #'private - ffi' }
-GtNatoveExternalProcessOutput >> primtGetStderrString [
+GtNativeExternalProcessOutput >> primtGetStderrString [
 	^ self ffiCall: #(void* process_output_stderr_string(self))
 ]
 
 { #category : #'private - ffi' }
-GtNatoveExternalProcessOutput >> primtGetStdout [
+GtNativeExternalProcessOutput >> primtGetStdout [
 	^ self ffiCall: #(void* process_output_stdout(self))
 ]
 
 { #category : #'private - ffi' }
-GtNatoveExternalProcessOutput >> primtGetStdoutString [
+GtNativeExternalProcessOutput >> primtGetStdoutString [
 	^ self ffiCall: #(void* process_output_stdout_string(self))
 ]
 
 { #category : #accessing }
-GtNatoveExternalProcessOutput >> stderr [
+GtNativeExternalProcessOutput >> stderr [
 	^ GtBoxerArrayU8 fromNativeHandle: self primtGetStderr
 ]
 
 { #category : #accessing }
-GtNatoveExternalProcessOutput >> stderrString [
+GtNativeExternalProcessOutput >> stderrString [
 	^ (GtBoxerString fromNativeHandle: self primtGetStderrString) string
 ]
 
 { #category : #accessing }
-GtNatoveExternalProcessOutput >> stdout [
+GtNativeExternalProcessOutput >> stdout [
 	^ GtBoxerArrayU8 fromNativeHandle: self primtGetStdout
 ]
 
 { #category : #accessing }
-GtNatoveExternalProcessOutput >> stdoutString [
+GtNativeExternalProcessOutput >> stdoutString [
 	^ (GtBoxerString fromNativeHandle: self primtGetStdoutString) string
 ]

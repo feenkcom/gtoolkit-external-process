@@ -3,9 +3,11 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'command',
-		'arguments'
+		'arguments',
+		'stdout',
+		'stderr'
 	],
-	#category : #'GToolkit-ExternalProcess-Process'
+	#category : #'GToolkit-ExternalProcess-Core'
 }
 
 { #category : #accessing }
@@ -41,6 +43,7 @@ GtExternalProcessBuilder >> createNativeCommand [
 	
 	anExternalCommand := GtNativeExternalProcessCommand new: self command.
 	arguments do: [ :eachArgument | anExternalCommand arg: eachArgument ].
+	stdout applyOnStdoutOf: anExternalCommand.
 
 	^ anExternalCommand
 ]
@@ -55,6 +58,16 @@ GtExternalProcessBuilder >> initialize [
 { #category : #'api - spawning' }
 GtExternalProcessBuilder >> output [
 	^ self createNativeCommand output
+]
+
+{ #category : #accessing }
+GtExternalProcessBuilder >> pipeStderr [
+	stderr := GtExternalProcessPipedStdio new
+]
+
+{ #category : #accessing }
+GtExternalProcessBuilder >> pipeStdout [
+	stdout := GtExternalProcessPipedStdio new
 ]
 
 { #category : #'api - spawning' }
