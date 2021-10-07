@@ -4,45 +4,6 @@ Class {
 	#category : #'GToolkit-ExternalProcess-Library'
 }
 
-{ #category : #logger }
-GtExternalProcessLibrary class >> initEnvLogger [
-	self uniqueInstance initEnvLogger
-]
-
-{ #category : #logger }
-GtExternalProcessLibrary class >> initIcu [
-	self uniqueInstance initIcu
-]
-
-{ #category : #'class initialization' }
-GtExternalProcessLibrary class >> initialize [
-	SessionManager default registerUserClassNamed: self name
-]
-
-{ #category : #installation }
-GtExternalProcessLibrary class >> install [
-	<script: 'self install'>
-	| installer |
-
-	installer := GtLibraryInstaller new.
-	installer library: 'Skia'.
-	installer version: 'development'.
-	installer icon: (Form extent: 1@1 depth: 32).
-	installer binary: 'libSkia'.
-	installer url: 'https://dl.feenk.com/{library}/{platform}/{version}/{arch}/{binary}.{extension}'.
-	installer works: [ SkiaLibrary uniqueInstance hasModule ].
-
-	installer run
-]
-
-{ #category : #'class initialization' }
-GtExternalProcessLibrary class >> startUp: isANewSession [
-	isANewSession
-		ifTrue: [
-			self initEnvLogger.
-			self initIcu ]
-]
-
 { #category : #'api - library' }
 GtExternalProcessLibrary >> detectLibrary: aFileName [
 	"Pharo9 introduced a platform specific FFILibraryFinder which should be used instead of this custom implementation"
