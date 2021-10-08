@@ -11,11 +11,14 @@ Class {
 BaselineOfGToolkitExternalProcess >> baseline: spec [
 	<baseline>
 	spec for: #'common' do: [
-		spec 
+		spec
 			baseline: 'GToolkitBoxer' with: [
-				spec repository: 'github://feenkcom/gtoolkit-boxer:main/boxer-bindings' ];
+				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.18/boxer-bindings' ].
+		spec
 			baseline: 'GToolkitExamplesEngine' with: [
-				spec repository: 'github://feenkcom/gtoolkit-examples:main/src' ].
+				spec repository: 'github://feenkcom/gtoolkit-examples:v0.8.33/src' ].
+
 		spec package: 'GToolkit-ExternalProcess' with: [
-				spec requires: #('GToolkitBoxer' 'GToolkitExamplesEngine' ). ]. ].
+			spec requires: #('GToolkitBoxer' 'GToolkitExamplesEngine') ].
+	]
 ]
