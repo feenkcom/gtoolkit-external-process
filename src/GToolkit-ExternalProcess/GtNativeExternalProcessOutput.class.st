@@ -40,9 +40,7 @@ GtNativeExternalProcessOutput >> primtGetStdoutString [
 GtNativeExternalProcessOutput >> stderr [
 	<return: #String>
 
-	^ GtBoxerString
-		fromNativeHandle: self primtGetStderrString
-		during: [ :aBoxerString | aBoxerString string ]
+	^ self stderrString
 ]
 
 { #category : #accessing }
@@ -55,16 +53,32 @@ GtNativeExternalProcessOutput >> stderrBytes [
 ]
 
 { #category : #accessing }
-GtNativeExternalProcessOutput >> stdout [
+GtNativeExternalProcessOutput >> stderrString [
 	<return: #String>
 
 	^ GtBoxerString
-		fromNativeHandle: self primtGetStdoutString
+		fromNativeHandle: self primtGetStderrString
 		during: [ :aBoxerString | aBoxerString string ]
 ]
 
 { #category : #accessing }
+GtNativeExternalProcessOutput >> stdout [
+	<return: #String>
+
+	^ self stdoutString
+]
+
+{ #category : #accessing }
 GtNativeExternalProcessOutput >> stdoutBytes [
+	<return: #ByteArray>
+
+	^ GtBoxerArrayU8
+		fromNativeHandle: self primtGetStdout
+		during: [ :anArrayU8 | anArrayU8 asByteArray ]
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessOutput >> stdoutString [
 	<return: #ByteArray>
 
 	^ GtBoxerArrayU8

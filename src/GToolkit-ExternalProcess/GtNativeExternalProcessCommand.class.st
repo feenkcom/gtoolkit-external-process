@@ -120,9 +120,22 @@ GtNativeExternalProcessCommand >> primSpawn [
 	^ self ffiCall: #(void* process_command_spawn(self))
 ]
 
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primWindowsProcessCreationFlags: aNumber [
+	^ self ffiCall: #(void process_windows_creation_flags(self, uint32 aNumber))
+]
+
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> spawn [
 	^ GtNativeExternalProcessChild fromNativeHandle: self primSpawn
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> windowsProcessCreationFlags: aNumber [
+	"Sets the Windows specific process creation flags[1] to be passed to `CreateProcess`.
+	See https://docs.microsoft.com/en-us/windows/win32/procthread/process-creation-flags"
+
+	self primWindowsProcessCreationFlags: aNumber
 ]
 
 { #category : #'api - command' }
