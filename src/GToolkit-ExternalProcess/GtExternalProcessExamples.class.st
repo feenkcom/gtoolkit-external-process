@@ -59,6 +59,7 @@ GtExternalProcessExamples >> inheritedHelloWorld [
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> pipedHelloWorld [
 	<gtExample>
+	<noTest>
 	| output stdout |
 
 	output := GtExternalProcessBuilder new
