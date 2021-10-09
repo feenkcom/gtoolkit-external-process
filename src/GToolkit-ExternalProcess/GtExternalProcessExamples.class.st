@@ -77,6 +77,7 @@ GtExternalProcessExamples >> pipedHelloWorld [
 { #category : #examples }
 GtExternalProcessExamples >> setAndEchoEnvVar [
 	<gtExample>
+	<noTest>
 	| anOutput anStdout |
 
 	anOutput := OSPlatform current isWindows
