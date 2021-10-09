@@ -76,6 +76,11 @@ GtNativeExternalProcessCommand >> primArg: aGtBoxerString [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primCurrentDirectory: aPathString [
+	^ self ffiCall: #(void process_command_current_dir(self, GtBoxerString aPathString))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primInheritStderr [
 	^ self ffiCall: #(void process_command_inherit_stderr(self))
 ]
@@ -111,11 +116,55 @@ GtNativeExternalProcessCommand >> primPipeStdout [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primSetEnvKey: aGtBoxerStringKey value: aGtBoxerStringValue [
+	^ self ffiCall: #(void process_command_env(self, GtBoxerString aGtBoxerStringKey, GtBoxerString aGtBoxerStringValue))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primSpawn [
 	^ self ffiCall: #(void* process_command_spawn(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primWindowsProcessCreationFlags: aNumber [
+	^ self ffiCall: #(void process_windows_creation_flags(self, uint32 aNumber))
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> setEnv: aNameString value: aValueString [
+	self
+		assert: [ aNameString isString and: [ aNameString isSymbol not ] ]
+		description: [ 'Env.var name must be a String but was {1}' format: { aNameString class name } ].
+		
+	self
+		assert: [ aValueString isString and: [ aValueString isSymbol not ] ]
+		description: [ 'Env.var value must be a String but was {1}' format: { aValueString class name } ].
+
+	GtBoxerString
+		fromString: aNameString
+		during: [ :aGtBoxerStringKey | 
+			GtBoxerString
+				fromString: aValueString
+				during: [ :aGtBoxerStringValue | 
+					self primSetEnvKey: aGtBoxerStringKey value: aGtBoxerStringValue ] ]
 ]
 
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> spawn [
 	^ GtNativeExternalProcessChild fromNativeHandle: self primSpawn
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> windowsProcessCreationFlags: aNumber [
+	"Sets the Windows specific process creation flags[1] to be passed to `CreateProcess`.
+	See https://docs.microsoft.com/en-us/windows/win32/procthread/process-creation-flags"
+
+	self primWindowsProcessCreationFlags: aNumber
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> workingDirectory: aFileReference [
+	GtBoxerString
+		fromString: aFileReference fullName
+		during: [ :aBoxerString | self primCurrentDirectory: aBoxerString ]
 ]
