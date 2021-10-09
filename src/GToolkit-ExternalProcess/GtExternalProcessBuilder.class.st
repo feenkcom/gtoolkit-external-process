@@ -5,7 +5,8 @@ Class {
 		'command',
 		'arguments',
 		'stdout',
-		'stderr'
+		'stderr',
+		'workingDirectory'
 	],
 	#category : #'GToolkit-ExternalProcess-Core'
 }
@@ -16,9 +17,8 @@ GtExternalProcessBuilder >> arg: anArgumentString [
 ]
 
 { #category : #accessing }
-GtExternalProcessBuilder >> args: anObject [
-
-	arguments := anObject asOrderedCollection
+GtExternalProcessBuilder >> args: aCollection [
+	arguments addAll: aCollection
 ]
 
 { #category : #accessing }
@@ -43,9 +43,11 @@ GtExternalProcessBuilder >> createNativeCommand [
 	
 	anExternalCommand := GtNativeExternalProcessCommand new: self command.
 	arguments do: [ :eachArgument | anExternalCommand arg: eachArgument ].
+	workingDirectory ifNotNil: [ anExternalCommand workingDirectory: workingDirectory ].
+
 	stdout applyOnStdoutOf: anExternalCommand.
 	stderr applyOnStderrOf: anExternalCommand.
-
+	
 	^ anExternalCommand
 ]
 
@@ -64,8 +66,8 @@ GtExternalProcessBuilder >> initialize [
 	super initialize.
 	
 	arguments := OrderedCollection new.
-	stdout := GtExternalProcessInheritedStdio new.
-	stderr := GtExternalProcessInheritedStdio new
+	stdout := GtExternalProcessDefaultStdio new.
+	stderr := GtExternalProcessDefaultStdio new
 ]
 
 { #category : #'api - spawning' }
@@ -86,4 +88,9 @@ GtExternalProcessBuilder >> pipeStdout [
 { #category : #'api - spawning' }
 GtExternalProcessBuilder >> spawn [
 	^ self createNativeCommand spawn
+]
+
+{ #category : #accessing }
+GtExternalProcessBuilder >> workingDirectory: aFileReference [
+	workingDirectory := aFileReference asFileReference
 ]

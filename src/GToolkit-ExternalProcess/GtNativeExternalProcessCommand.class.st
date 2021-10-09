@@ -76,6 +76,11 @@ GtNativeExternalProcessCommand >> primArg: aGtBoxerString [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primCurrentDirectory: aPathString [
+	^ self ffiCall: #(void process_command_current_dir(self, GtBoxerString aPathString))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primInheritStderr [
 	^ self ffiCall: #(void process_command_inherit_stderr(self))
 ]
@@ -118,4 +123,11 @@ GtNativeExternalProcessCommand >> primSpawn [
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> spawn [
 	^ GtNativeExternalProcessChild fromNativeHandle: self primSpawn
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> workingDirectory: aFileReference [
+	GtBoxerString
+		fromString: aFileReference fullName
+		during: [ :aBoxerString | self primCurrentDirectory: aBoxerString ]
 ]
