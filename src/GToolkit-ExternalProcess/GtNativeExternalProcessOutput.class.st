@@ -79,9 +79,9 @@ GtNativeExternalProcessOutput >> stdoutBytes [
 
 { #category : #accessing }
 GtNativeExternalProcessOutput >> stdoutString [
-	<return: #ByteArray>
+	<return: #String>
 
-	^ GtBoxerArrayU8
-		fromNativeHandle: self primtGetStdout
-		during: [ :anArrayU8 | anArrayU8 asByteArray ]
+	^ GtBoxerString
+		fromNativeHandle: self primtGetStdoutString
+		during: [ :aBoxerString | aBoxerString string ]
 ]

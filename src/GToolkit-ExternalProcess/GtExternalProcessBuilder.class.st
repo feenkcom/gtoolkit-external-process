@@ -1,3 +1,12 @@
+"
+#External process builder
+A process builder, providing fine-grained control over how a new process should be spawned.
+A default configuration can be generated using:
+ {{gtExample:GtExternalProcessExamples>>defaultProcessBuilder}}
+ 
+Additional builder methods allow the configuration to be changed (for example, by adding arguments) prior to spawning:
+
+"
 Class {
 	#name : #GtExternalProcessBuilder,
 	#superclass : #Object,
