@@ -72,6 +72,11 @@ GtNativeExternalProcessChild >> primTryWait [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primWait [
+	^ self ffiCall: #(void* process_child_wait(self))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primWaitWithOutput [
 	^ self ffiCall: #(void* process_child_wait_with_output(self))
 ]
@@ -84,6 +89,13 @@ GtNativeExternalProcessChild >> tryWait [
 	^ anExitStatusHandle isNull
 		ifTrue: [ nil ]
 		ifFalse: [ GtNativeExternalProcessExitStatus fromNativeHandle: anExitStatusHandle ]
+]
+
+{ #category : #'api - process' }
+GtNativeExternalProcessChild >> wait [
+	<return: #GtNativeExternalProcessExitStatus>
+
+	^ GtNativeExternalProcessExitStatus fromNativeHandle: self primWait
 ]
 
 { #category : #'api - process' }

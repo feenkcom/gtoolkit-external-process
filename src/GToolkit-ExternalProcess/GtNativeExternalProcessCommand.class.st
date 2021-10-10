@@ -126,6 +126,11 @@ GtNativeExternalProcessCommand >> primSpawn [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primStatus [
+	^ self ffiCall: #(void* process_command_status(self))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primWindowsProcessCreationFlags: aNumber [
 	^ self ffiCall: #(void process_windows_creation_flags(self, uint32 aNumber))
 ]
@@ -152,6 +157,11 @@ GtNativeExternalProcessCommand >> setEnv: aNameString value: aValueString [
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> spawn [
 	^ GtNativeExternalProcessChild fromNativeHandle: self primSpawn
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> status [
+	^ GtNativeExternalProcessExitStatus fromNativeHandle: self primStatus
 ]
 
 { #category : #'api - command' }
