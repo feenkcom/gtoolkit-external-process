@@ -252,6 +252,15 @@ GtExternalProcessBuilder >> spawn [
 	^ self createNativeCommand spawn
 ]
 
+{ #category : #'api - spawning' }
+GtExternalProcessBuilder >> status [
+	"Executes a command as a child process, waiting for it to finish and collecting its status.
+	By default, stdin, stdout and stderr are inherited from the parent."
+	<return: #GtNativeExternalProcessExitStatus>
+
+	^ self createNativeCommand status
+]
+
 { #category : #'api - configuration' }
 GtExternalProcessBuilder >> stderr: aGtExternalProcessStdio [
 	"Configuration for the child process's standard error (stderr) handle.
