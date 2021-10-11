@@ -36,6 +36,11 @@ GtNativeExternalProcessCommand >> arg: anArgument [
 ]
 
 { #category : #'api - command' }
+GtNativeExternalProcessCommand >> clearEnv [
+	self primClearEnv
+]
+
+{ #category : #'api - command' }
 GtNativeExternalProcessCommand >> inheritStderr [
 	self primInheritStderr
 ]
@@ -73,6 +78,11 @@ GtNativeExternalProcessCommand >> pipeStdout [
 { #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primArg: aGtBoxerString [
 	^ self ffiCall: #(void process_command_arg(self, GtBoxerString aGtBoxerString))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primClearEnv [
+	^ self ffiCall: #(void process_command_env_clear(self))
 ]
 
 { #category : #'private - ffi' }
@@ -116,6 +126,11 @@ GtNativeExternalProcessCommand >> primPipeStdout [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primRemoveEnvKey: aGtBoxerStringKey [
+	^ self ffiCall: #(void process_command_env_remove(self, GtBoxerString aGtBoxerStringKey))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primSetEnvKey: aGtBoxerStringKey value: aGtBoxerStringValue [
 	^ self ffiCall: #(void process_command_env(self, GtBoxerString aGtBoxerStringKey, GtBoxerString aGtBoxerStringValue))
 ]
@@ -133,6 +148,17 @@ GtNativeExternalProcessCommand >> primStatus [
 { #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primWindowsProcessCreationFlags: aNumber [
 	^ self ffiCall: #(void process_windows_creation_flags(self, uint32 aNumber))
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> removeEnv: aNameString [
+	self
+		assert: [ aNameString isString and: [ aNameString isSymbol not ] ]
+		description: [ 'Env.var name must be a String but was {1}' format: { aNameString class name } ].
+
+	GtBoxerString
+		fromString: aNameString
+		during: [ :aGtBoxerStringKey | self primRemoveEnvKey: aGtBoxerStringKey ]
 ]
 
 { #category : #'api - command' }
