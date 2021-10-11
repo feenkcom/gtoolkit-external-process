@@ -106,6 +106,13 @@ GtExternalProcessBuilder >> arguments [
 	^ arguments
 ]
 
+{ #category : #'api - configuration' }
+GtExternalProcessBuilder >> clearEnv [
+	"Clears the entire environment map for the child process."
+
+	environmentVariablesCommands add: (#clear -> nil)
+]
+
 { #category : #accessing }
 GtExternalProcessBuilder >> command [
 	^ command
@@ -136,7 +143,13 @@ GtExternalProcessBuilder >> createNativeCommand [
 			ifTrue: [
 				anExternalCommand
 					setEnv: eachCommand value key asString
-					value: eachCommand value value asString ] ].
+					value: eachCommand value value asString ].
+		eachCommand key = #remove
+			ifTrue: [
+				anExternalCommand
+					removeEnv: eachCommand value ].
+		eachCommand key = #clear
+			ifTrue: [ anExternalCommand clearEnv ] ].
 
 	workingDirectory ifNotNil: [ anExternalCommand workingDirectory: workingDirectory ].
 
@@ -242,6 +255,20 @@ GtExternalProcessBuilder >> pipeStdout [
 	"A new pipe should be arranged to connect the standard output (stdout) handle of parent and child processes."
 
 	self stdout: GtExternalProcessPipedStdio new
+]
+
+{ #category : #'api - configuration' }
+GtExternalProcessBuilder >> removeEnv: aNameSymbol [
+	"Removes an environment variable mapping.
+
+	Note that environment variable names are case-insensitive (but case-preserving) on Windows,
+	and case-sensitive on all other platforms."
+
+	self
+		assert: [ aNameSymbol isString ]
+		description: [ 'Env.var name must be a String but was {1}' format: { aNameSymbol class name } ].
+
+	environmentVariablesCommands add: (#remove -> aNameSymbol)
 ]
 
 { #category : #'api - spawning' }
