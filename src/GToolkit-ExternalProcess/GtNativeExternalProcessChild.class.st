@@ -1,6 +1,12 @@
 Class {
 	#name : #GtNativeExternalProcessChild,
 	#superclass : #GtBoxerValueBox,
+	#instVars : [
+		'pollDuration'
+	],
+	#classVars : [
+		'SessionAnnouncer'
+	],
 	#category : #'GToolkit-ExternalProcess-External'
 }
 
@@ -9,11 +15,35 @@ GtNativeExternalProcessChild class >> ffiLibraryName [
 	^ GtExternalProcessLibrary
 ]
 
+{ #category : #initialization }
+GtNativeExternalProcessChild class >> initialize [ 
+	"Get notified on session shutdown so registered processes can be terminated"
+
+	SessionManager default 
+		registerUserClassNamed: self name.
+
+]
+
 { #category : #'private - ffi' }
 GtNativeExternalProcessChild class >> primRelease: aHandle [
 	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
 	^ self ffiCall: #(void process_child_drop(void** aHandle))
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessChild class >> sessionAnnouncer [
+
+	^ SessionAnnouncer ifNil: [ SessionAnnouncer := Announcer new ]
+]
+
+{ #category : #'system startup & shutdown' }
+GtNativeExternalProcessChild class >> shutDown: quitting [
+	"Announce the shutdown.
+	Registered processes will then terminate themselves (not a T-800)."
+
+	quitting ifTrue:
+		[ self sessionAnnouncer announce: GtExternalProcessShutdownAnnouncement new ].
 ]
 
 { #category : #'api - process' }
@@ -31,6 +61,13 @@ GtNativeExternalProcessChild >> id [
 	^ self primId
 ]
 
+{ #category : #initialization }
+GtNativeExternalProcessChild >> initialize [
+
+	super initialize.
+	pollDuration := 50 milliSeconds.
+]
+
 { #category : #testing }
 GtNativeExternalProcessChild >> isTerminated [
 	^ self primIsTerminated
@@ -38,6 +75,7 @@ GtNativeExternalProcessChild >> isTerminated [
 
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> kill [
+
 	^ self primKill
 ]
 
@@ -81,6 +119,33 @@ GtNativeExternalProcessChild >> primWaitWithOutput [
 	^ self ffiCall: #(void* process_child_wait_with_output(self))
 ]
 
+{ #category : #private }
+GtNativeExternalProcessChild >> quitImage [
+	"The image is exiting, kill the process and flag polling to stop"
+
+	^ self primKill
+]
+
+{ #category : #'system startup & shutdown' }
+GtNativeExternalProcessChild >> terminateOnShutdown [
+	"Register the receiver to be killed when Pharo exits"
+
+	self class sessionAnnouncer weak 
+		when: GtExternalProcessShutdownAnnouncement
+		send: #quitImage
+		to: self.
+]
+
+{ #category : #private }
+GtNativeExternalProcessChild >> throttlePollDuration [
+	"Progressively slow the poll duration to something over 500mS.
+	This balances the desire to poll of short lived processes frequently and long lived processes rarely."
+
+	pollDuration asNanoSeconds < 500000000 ifTrue:
+		[ pollDuration := Duration nanoSeconds: 
+			(pollDuration asNanoSeconds * 2 min: 500000000) ].
+]
+
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> tryWait [
 	| anExitStatusHandle |
@@ -98,6 +163,18 @@ GtNativeExternalProcessChild >> wait [
 	^ GtNativeExternalProcessExitStatus fromNativeHandle: self primWait
 ]
 
+{ #category : #private }
+GtNativeExternalProcessChild >> waitForExitDoing: aBlock [
+	"Wait for the process to exit, evaluating the block every pollDuration seconds"
+
+	[ pollDuration wait.
+	self isTerminated ] whileFalse:
+		[ aBlock cull: self.
+		self throttlePollDuration ].
+	"Catch anything that may have be written during the last wait"
+	aBlock cull: self.
+]
+
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> waitWithOutput [
 	| anOutput |
@@ -106,4 +183,11 @@ GtNativeExternalProcessChild >> waitWithOutput [
 	self release.
 
 	^ anOutput
+]
+
+{ #category : #testing }
+GtNativeExternalProcessChild >> willTerminateOnShutdown [
+	"Answer a boolean indicating whether the receiver will be killed on shutdown"
+
+	^ self class sessionAnnouncer hasSubscriber: self
 ]
