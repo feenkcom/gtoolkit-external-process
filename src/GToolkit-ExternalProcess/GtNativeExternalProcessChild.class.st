@@ -61,13 +61,6 @@ GtNativeExternalProcessChild >> id [
 	^ self primId
 ]
 
-{ #category : #initialization }
-GtNativeExternalProcessChild >> initialize [
-
-	super initialize.
-	pollDuration := 50 milliSeconds.
-]
-
 { #category : #testing }
 GtNativeExternalProcessChild >> isTerminated [
 	^ self primIsTerminated
@@ -80,16 +73,6 @@ GtNativeExternalProcessChild >> kill [
 	<return: #Boolean>
 
 	^ self primKill
-]
-
-{ #category : #'api - process' }
-GtNativeExternalProcessChild >> kill: aSignalValue [
-	"Forces the child process to exit by sending it a Unix Signal and return true if it was succesful.
-	If the child has already exited, false is returned.
-	Supported on Unix platforms, On Windows, falls back to #kill."
-	<return: #Boolean>
-
-	^ self primKillWithSignal: aSignalValue
 ]
 
 { #category : #'private - ffi' }
@@ -144,6 +127,15 @@ GtNativeExternalProcessChild >> quitImage [
 	^ self primKill
 ]
 
+{ #category : #'api - process' }
+GtNativeExternalProcessChild >> signal: aSignalValue [
+	"Send the specified signal to the receiver's OS process.
+	Supported on Unix platforms, On Windows, falls back to #kill."
+	<return: #Boolean>
+
+	^ self primKillWithSignal: aSignalValue
+]
+
 { #category : #'system startup & shutdown' }
 GtNativeExternalProcessChild >> terminateOnShutdown [
 	"Register the receiver to be killed when Pharo exits"
@@ -152,16 +144,6 @@ GtNativeExternalProcessChild >> terminateOnShutdown [
 		when: GtExternalProcessShutdownAnnouncement
 		send: #quitImage
 		to: self.
-]
-
-{ #category : #private }
-GtNativeExternalProcessChild >> throttlePollDuration [
-	"Progressively slow the poll duration to something over 500mS.
-	This balances the desire to poll of short lived processes frequently and long lived processes rarely."
-
-	pollDuration asNanoSeconds < 500000000 ifTrue:
-		[ pollDuration := Duration nanoSeconds: 
-			(pollDuration asNanoSeconds * 2 min: 500000000) ].
 ]
 
 { #category : #'api - process' }
@@ -181,16 +163,13 @@ GtNativeExternalProcessChild >> wait [
 	^ GtNativeExternalProcessExitStatus fromNativeHandle: self primWait
 ]
 
-{ #category : #private }
+{ #category : #'api - process' }
 GtNativeExternalProcessChild >> waitForExitDoing: aBlock [
 	"Wait for the process to exit, evaluating the block every pollDuration seconds"
 
-	[ pollDuration wait.
-	self isTerminated ] whileFalse:
-		[ aBlock cull: self.
-		self throttlePollDuration ].
-	"Catch anything that may have be written during the last wait"
-	aBlock cull: self.
+	GtNativeExternalProcessPoll 
+		child: self
+		waitForExitDoing: aBlock
 ]
 
 { #category : #'api - process' }
