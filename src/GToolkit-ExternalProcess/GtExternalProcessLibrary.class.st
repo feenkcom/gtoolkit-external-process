@@ -4,6 +4,23 @@ Class {
 	#category : #'GToolkit-ExternalProcess-Library'
 }
 
+{ #category : #logger }
+GtExternalProcessLibrary class >> initEnvLogger [
+	self uniqueInstance initEnvLogger
+]
+
+{ #category : #'system startup' }
+GtExternalProcessLibrary class >> initialize [
+	SessionManager default registerUserClassNamed: self name
+]
+
+{ #category : #'system startup' }
+GtExternalProcessLibrary class >> startUp: isANewSession [
+	isANewSession
+		ifTrue: [
+			self initEnvLogger ]
+]
+
 { #category : #'api - library' }
 GtExternalProcessLibrary >> detectLibrary: aFileName [
 	"Pharo9 introduced a platform specific FFILibraryFinder which should be used instead of this custom implementation"
@@ -33,11 +50,23 @@ GtExternalProcessLibrary >> hasModule [
 ]
 
 { #category : #'api - library' }
+GtExternalProcessLibrary >> initEnvLogger [
+	[ self primInitEnvLogger ]
+		on: Error
+		do: [ :e | NonInteractiveTranscript stdout nextPutAll: '[Process] Could not init env logger'; cr ]
+]
+
+{ #category : #'api - library' }
 GtExternalProcessLibrary >> macLibraryName [
 	^ self class environment
 		at: #FFIMacLibraryFinder
 		ifPresent: [ :aLibraryFinder | aLibraryFinder findLibrary: 'libProcess.dylib' ]
 		ifAbsent: [ self detectLibrary: 'libProcess.dylib' ]
+]
+
+{ #category : #'private - ffi' }
+GtExternalProcessLibrary >> primInitEnvLogger [
+	^ self ffiCall: #(void process_init_env_logger())
 ]
 
 { #category : #'private - ffi' }
