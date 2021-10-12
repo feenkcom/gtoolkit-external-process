@@ -38,7 +38,21 @@ GtNativeExternalProcessChild >> isTerminated [
 
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> kill [
+	"Forces the child process to exit and return true if it was succesful. If the child has already exited, false is returned.
+	This is equivalent to sending a SIGKILL on Unix platforms."
+	<return: #Boolean>
+
 	^ self primKill
+]
+
+{ #category : #'api - process' }
+GtNativeExternalProcessChild >> kill: aSignalValue [
+	"Forces the child process to exit by sending it a Unix Signal and return true if it was succesful.
+	If the child has already exited, false is returned.
+	Supported on Unix platforms, On Windows, falls back to #kill."
+	<return: #Boolean>
+
+	^ self primKillWithSignal: aSignalValue
 ]
 
 { #category : #'private - ffi' }
@@ -54,6 +68,11 @@ GtNativeExternalProcessChild >> primIsTerminated [
 { #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primKill [
 	^ self ffiCall: #(bool process_child_kill(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primKillWithSignal: aSignal [
+	^ self ffiCall: #(bool process_child_kill_with_signal(self, int aSignal))
 ]
 
 { #category : #'private - ffi' }
