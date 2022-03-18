@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #'library path' }
-GtNativeExternalProcessOutput class >> ffiLibraryName [
+GtNativeExternalProcessOutput class >> ffiLibrary [
 	^ GtExternalProcessLibrary
 ]
 
