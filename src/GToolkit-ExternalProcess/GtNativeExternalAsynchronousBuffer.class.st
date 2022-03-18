@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #'library path' }
-GtNativeExternalAsynchronousBuffer class >> ffiLibraryName [
+GtNativeExternalAsynchronousBuffer class >> ffiLibrary [
 	^ GtExternalProcessLibrary
 ]
 
