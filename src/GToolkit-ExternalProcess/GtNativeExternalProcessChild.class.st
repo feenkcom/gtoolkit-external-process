@@ -56,9 +56,29 @@ GtNativeExternalProcessChild >> asynchronousStdout [
 	^ (GtNativeExternalAsynchronousStdout fromNativeHandle: (self primTakeAsynchronousStdout)) childProcess: self
 ]
 
+{ #category : #ui }
+GtNativeExternalProcessChild >> gtSummaryFor: aView [
+	<gtView>
+
+	^ aView columnedList
+		  title: 'Summary';
+		  priority: 10;
+		  items: [ self summaryAttributes ];
+		  column: #Attribute text: [ :item | item first ];
+		  column: #Value text: [ :item | item second ];
+		  send: [ :item | item third ];
+		  actionUpdateButton
+]
+
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> id [
 	^ self primId
+]
+
+{ #category : #testing }
+GtNativeExternalProcessChild >> isRunning [
+
+	^ self isTerminated not
 ]
 
 { #category : #testing }
@@ -134,6 +154,24 @@ GtNativeExternalProcessChild >> signal: aSignalValue [
 	<return: #Boolean>
 
 	^ self primKillWithSignal: aSignalValue
+]
+
+{ #category : #ui }
+GtNativeExternalProcessChild >> summaryAttributes [
+	| attributes exitStatus |
+
+	attributes := OrderedCollection new.
+	self isRunning
+		ifTrue: [ attributes add: { #Running. true. self. } ]
+		ifFalse: 
+			[ exitStatus := self wait.
+			attributes
+				add: { #Successful. exitStatus isSuccess. exitStatus. };
+				add: { #Status. exitStatus code ifNil: [ 'terminated by signal without code' ]. exitStatus. } ].
+	attributes
+		add: { #PID. self id. self. };
+		add: { #TerminateOnShutdown. self willTerminateOnShutdown. self. }.
+	^ attributes.
 ]
 
 { #category : #'system startup & shutdown' }
