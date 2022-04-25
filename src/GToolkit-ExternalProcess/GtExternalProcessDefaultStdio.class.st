@@ -8,3 +8,8 @@ Class {
 	#superclass : #GtExternalProcessStdio,
 	#category : #'GToolkit-ExternalProcess-Core'
 }
+
+{ #category : #converting }
+GtExternalProcessDefaultStdio >> asNativeStdioDuring: aBlock [
+	^ aBlock value: GtNativeExternalProcessStdio null
+]

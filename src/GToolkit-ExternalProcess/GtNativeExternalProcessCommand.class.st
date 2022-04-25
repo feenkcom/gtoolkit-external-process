@@ -41,38 +41,8 @@ GtNativeExternalProcessCommand >> clearEnv [
 ]
 
 { #category : #'api - command' }
-GtNativeExternalProcessCommand >> inheritStderr [
-	self primInheritStderr
-]
-
-{ #category : #'api - command' }
-GtNativeExternalProcessCommand >> inheritStdin [
-	self primInheritStdin
-]
-
-{ #category : #'api - command' }
-GtNativeExternalProcessCommand >> inheritStdout [
-	self primInheritStdout
-]
-
-{ #category : #'api - command' }
 GtNativeExternalProcessCommand >> output [
 	^ GtNativeExternalProcessOutput fromNativeHandle: self primOutput
-]
-
-{ #category : #'api - command' }
-GtNativeExternalProcessCommand >> pipeStderr [
-	self primPipeStderr
-]
-
-{ #category : #'api - command' }
-GtNativeExternalProcessCommand >> pipeStdin [
-	self primPipeStdin
-]
-
-{ #category : #'api - command' }
-GtNativeExternalProcessCommand >> pipeStdout [
-	self primPipeStdout
 ]
 
 { #category : #'private - ffi' }
@@ -91,38 +61,8 @@ GtNativeExternalProcessCommand >> primCurrentDirectory: aPathString [
 ]
 
 { #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primInheritStderr [
-	^ self ffiCall: #(void process_command_inherit_stderr(self))
-]
-
-{ #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primInheritStdin [
-	^ self ffiCall: #(void process_command_inherit_stdin(self))
-]
-
-{ #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primInheritStdout [
-	^ self ffiCall: #(void process_command_inherit_stdout(self))
-]
-
-{ #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primOutput [
 	^ self ffiCall: #(void* process_command_output(self))
-]
-
-{ #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primPipeStderr [
-	^ self ffiCall: #(void process_command_pipe_stderr(self))
-]
-
-{ #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primPipeStdin [
-	^ self ffiCall: #(void process_command_pipe_stdin(self))
-]
-
-{ #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primPipeStdout [
-	^ self ffiCall: #(void process_command_pipe_stdout(self))
 ]
 
 { #category : #'private - ffi' }
@@ -133,6 +73,21 @@ GtNativeExternalProcessCommand >> primRemoveEnvKey: aGtBoxerStringKey [
 { #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primSetEnvKey: aGtBoxerStringKey value: aGtBoxerStringValue [
 	^ self ffiCall: #(void process_command_env(self, GtBoxerString aGtBoxerStringKey, GtBoxerString aGtBoxerStringValue))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primSetStderr: anStdio [
+	^ self ffiCall: #(void process_command_set_stderr(self, GtNativeExternalProcessStdio anStdio))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primSetStdin: anStdio [
+	^ self ffiCall: #(void process_command_set_stdin(self, GtNativeExternalProcessStdio anStdio))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessCommand >> primSetStdout: anStdio [
+	^ self ffiCall: #(void process_command_set_stdout(self, GtNativeExternalProcessStdio anStdio))
 ]
 
 { #category : #'private - ffi' }
@@ -188,6 +143,21 @@ GtNativeExternalProcessCommand >> spawn [
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> status [
 	^ GtNativeExternalProcessExitStatus fromNativeHandle: self primStatus
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> stderr: aGtNativeExternalProcessStdio [
+	self primSetStderr: aGtNativeExternalProcessStdio
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> stdin: aGtNativeExternalProcessStdio [
+	self primSetStdin: aGtNativeExternalProcessStdio
+]
+
+{ #category : #'api - command' }
+GtNativeExternalProcessCommand >> stdout: aGtNativeExternalProcessStdio [
+	self primSetStdout: aGtNativeExternalProcessStdio
 ]
 
 { #category : #'api - command' }

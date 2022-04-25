@@ -4,14 +4,7 @@ Class {
 	#category : #'GToolkit-ExternalProcess-Core'
 }
 
-{ #category : #dispatch }
-GtExternalProcessStdio >> applyOnStderrOf: aGtNativeExternalCommand [
-]
-
-{ #category : #dispatch }
-GtExternalProcessStdio >> applyOnStdinOf: aGtNativeExternalCommand [
-]
-
-{ #category : #dispatch }
-GtExternalProcessStdio >> applyOnStdoutOf: aGtNativeExternalCommand [
+{ #category : #converting }
+GtExternalProcessStdio >> asNativeStdioDuring: aBlock [
+	self subclassResponsibility
 ]
