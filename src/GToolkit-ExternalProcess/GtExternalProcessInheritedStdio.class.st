@@ -11,17 +11,7 @@ Class {
 	#category : #'GToolkit-ExternalProcess-Core'
 }
 
-{ #category : #dispatch }
-GtExternalProcessInheritedStdio >> applyOnStderrOf: aGtNativeExternalCommand [
-	aGtNativeExternalCommand inheritStderr
-]
-
-{ #category : #dispatch }
-GtExternalProcessInheritedStdio >> applyOnStdinOf: aGtNativeExternalCommand [
-	aGtNativeExternalCommand inheritStdin
-]
-
-{ #category : #dispatch }
-GtExternalProcessInheritedStdio >> applyOnStdoutOf: aGtNativeExternalCommand [
-	aGtNativeExternalCommand inheritStdout
+{ #category : #converting }
+GtExternalProcessInheritedStdio >> asNativeStdioDuring: aBlock [
+	^ GtNativeExternalProcessStdioInherited newDuring: aBlock
 ]

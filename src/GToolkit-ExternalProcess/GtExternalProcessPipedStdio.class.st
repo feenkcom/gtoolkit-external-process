@@ -13,17 +13,7 @@ Class {
 	#category : #'GToolkit-ExternalProcess-Core'
 }
 
-{ #category : #dispatch }
-GtExternalProcessPipedStdio >> applyOnStderrOf: aGtNativeExternalCommand [
-	aGtNativeExternalCommand pipeStderr
-]
-
-{ #category : #dispatch }
-GtExternalProcessPipedStdio >> applyOnStdinOf: aGtNativeExternalCommand [
-	aGtNativeExternalCommand pipeStdin
-]
-
-{ #category : #dispatch }
-GtExternalProcessPipedStdio >> applyOnStdoutOf: aGtNativeExternalCommand [
-	aGtNativeExternalCommand pipeStdout
+{ #category : #converting }
+GtExternalProcessPipedStdio >> asNativeStdioDuring: aBlock [
+	^ GtNativeExternalProcessStdioPiped newDuring: aBlock
 ]

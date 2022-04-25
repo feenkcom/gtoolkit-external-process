@@ -153,9 +153,10 @@ GtExternalProcessBuilder >> createNativeCommand [
 
 	workingDirectory ifNotNil: [ anExternalCommand workingDirectory: workingDirectory ].
 
-	stdout applyOnStdoutOf: anExternalCommand.
-	stderr applyOnStderrOf: anExternalCommand.
-	
+	stdout asNativeStdioDuring: [ :anStdio | anExternalCommand stdout: anStdio ].
+	stderr asNativeStdioDuring: [ :anStdio | anExternalCommand stderr: anStdio ].
+	stdin asNativeStdioDuring: [ :anStdio | anExternalCommand stdin: anStdio ].
+
 	OSPlatform current isWindows
 		ifTrue: [ anExternalCommand windowsProcessCreationFlags: windowsProcessCreationFlags ].
 	
@@ -188,21 +189,42 @@ GtExternalProcessBuilder >> envs: aCollectionOfAssociations [
 		self env: eachAssociation key value: eachAssociation value ]
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> fileStderr: aFileReference [
+	"Set the child to redirect the standard error (stderr) into a file."
+
+	self stderr: (GtExternalProcessFileStdio new fileReference: aFileReference)
+]
+
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> fileStdin: aFileReference [
+	"Set the child to read the standard input (stdin) from a file."
+
+	self stdin: (GtExternalProcessFileStdio new fileReference: aFileReference)
+]
+
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> fileStdout: aFileReference [
+	"Set the child to redirect the standard output (stdout) into a file."
+
+	self stdout: (GtExternalProcessFileStdio new fileReference: aFileReference)
+]
+
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> inheritStderr [
 	"Set the child to inherit the standard error (stderr) handle from the parent."
 
 	self stderr: GtExternalProcessInheritedStdio new
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> inheritStdin [
 	"Set the child to inherit the standard input (stdin) handle from the parent."
 
 	self stdin: GtExternalProcessInheritedStdio new
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> inheritStdout [
 	"Set the child to inherit the standard output (stdout) handle from the parent."
 
@@ -223,6 +245,27 @@ GtExternalProcessBuilder >> initialize [
 	windowsProcessCreationFlags := WINDOWS_CREATE_NO_WINDOW
 ]
 
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> nullStderr [
+	"Suppress the standard error (stderr) by redirecting it into the void."
+
+	self stderr: GtExternalProcessNullStdio new
+]
+
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> nullStdin [
+	"Suppress the standard inout (stdin) by reading from the void."
+
+	self stdin: GtExternalProcessNullStdio new
+]
+
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> nullStdout [
+	"Suppress the standard output (stdout) by redirecting it into the void."
+
+	self stdout: GtExternalProcessNullStdio new
+]
+
 { #category : #'api - spawning' }
 GtExternalProcessBuilder >> output [
 	"Executes the command as a child process, waiting for it to finish and
@@ -236,21 +279,21 @@ GtExternalProcessBuilder >> output [
 	^ self createNativeCommand output
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> pipeStderr [
 	"A new pipe should be arranged to connect the standard error (stderr) handle of parent and child processes."
 
 	self stderr: GtExternalProcessPipedStdio new
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> pipeStdin [
 	"A new pipe should be arranged to connect the standard input (stdin) handle of parent and child processes."
 
 	self stdin: GtExternalProcessPipedStdio new
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> pipeStdout [
 	"A new pipe should be arranged to connect the standard output (stdout) handle of parent and child processes."
 
@@ -288,7 +331,7 @@ GtExternalProcessBuilder >> status [
 	^ self createNativeCommand status
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> stderr: aGtExternalProcessStdio [
 	"Configuration for the child process's standard error (stderr) handle.
 	Defaults to `inherit` when used with `#spawn` or `#status`, and defaults to `piped` when used with `#output`"
@@ -296,14 +339,14 @@ GtExternalProcessBuilder >> stderr: aGtExternalProcessStdio [
 	stderr := aGtExternalProcessStdio
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> stdin: aGtExternalProcessStdio [
 	"Configuration for the child process's standard input (stdin) handle.
 	Defaults to `inherit` when used with `#spawn` or `#status`, and defaults to `piped` when used with `#output`"
 	stdin := aGtExternalProcessStdio
 ]
 
-{ #category : #'api - configuration' }
+{ #category : #'api - stdio' }
 GtExternalProcessBuilder >> stdout: aGtExternalProcessStdio [
 	"Configuration for the child process's standard output (stdout) handle.
 	Defaults to `inherit` when used with `#spawn` or `#status`, and defaults to `piped` when used with `#output`"
