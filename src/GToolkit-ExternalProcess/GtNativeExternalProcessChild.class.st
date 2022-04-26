@@ -91,8 +91,12 @@ GtNativeExternalProcessChild >> kill [
 	"Forces the child process to exit and return true if it was succesful. If the child has already exited, false is returned.
 	This is equivalent to sending a SIGKILL on Unix platforms."
 	<return: #Boolean>
+	| result |
 
-	^ self primKill
+	result := self primKill.
+	"Read the process exit status, otherwise a defunct process will be left behind"
+	self primWait.
+	^ result.
 ]
 
 { #category : #'private - ffi' }
@@ -172,6 +176,18 @@ GtNativeExternalProcessChild >> summaryAttributes [
 		add: { #PID. self id. self. };
 		add: { #TerminateOnShutdown. self willTerminateOnShutdown. self. }.
 	^ attributes.
+]
+
+{ #category : #'api - process' }
+GtNativeExternalProcessChild >> terminate [
+	"Send the child process SIGTERM and return true if it was succesful. If the child has already exited, false is returned."
+	<return: #Boolean>
+	| result |
+
+	result := self primKillWithSignal: 15.
+	"Read the process exit status, otherwise a defunct process will be left behind"
+	self primWait.
+	^ result.
 ]
 
 { #category : #'system startup & shutdown' }
