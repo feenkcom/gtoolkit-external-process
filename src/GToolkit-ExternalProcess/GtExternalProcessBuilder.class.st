@@ -153,9 +153,9 @@ GtExternalProcessBuilder >> createNativeCommand [
 
 	workingDirectory ifNotNil: [ anExternalCommand workingDirectory: workingDirectory ].
 
-	stdout asNativeStdioDuring: [ :anStdio | anExternalCommand stdout: anStdio ].
-	stderr asNativeStdioDuring: [ :anStdio | anExternalCommand stderr: anStdio ].
-	stdin asNativeStdioDuring: [ :anStdio | anExternalCommand stdin: anStdio ].
+	stdout asNativeStdioIn: self workingDirectory during: [ :anStdio | anExternalCommand stdout: anStdio ].
+	stderr asNativeStdioIn: self workingDirectory during: [ :anStdio | anExternalCommand stderr: anStdio ].
+	stdin asNativeStdioIn: self workingDirectory during: [ :anStdio | anExternalCommand stdin: anStdio ].
 
 	OSPlatform current isWindows
 		ifTrue: [ anExternalCommand windowsProcessCreationFlags: windowsProcessCreationFlags ].
@@ -352,6 +352,15 @@ GtExternalProcessBuilder >> stdout: aGtExternalProcessStdio [
 	Defaults to `inherit` when used with `#spawn` or `#status`, and defaults to `piped` when used with `#output`"
 
 	stdout := aGtExternalProcessStdio
+]
+
+{ #category : #accessing }
+GtExternalProcessBuilder >> workingDirectory [
+	<return: #FileReference>
+	"Return the working directory in which the command should be executed.
+	When not set, the current working directory of the VM is used"
+
+	^ workingDirectory ifNil: [ FileLocator workingDirectory ]
 ]
 
 { #category : #'api - configuration' }
