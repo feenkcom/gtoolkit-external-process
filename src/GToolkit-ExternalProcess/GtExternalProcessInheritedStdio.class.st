@@ -12,6 +12,6 @@ Class {
 }
 
 { #category : #converting }
-GtExternalProcessInheritedStdio >> asNativeStdioDuring: aBlock [
+GtExternalProcessInheritedStdio >> asNativeStdioIn: aWorkingDirectory during: aBlock [
 	^ GtNativeExternalProcessStdioInherited newDuring: aBlock
 ]

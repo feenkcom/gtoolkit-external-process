@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #converting }
-GtExternalProcessStdio >> asNativeStdioDuring: aBlock [
+GtExternalProcessStdio >> asNativeStdioIn: aWorkingDirectory during: aBlock [
 	self subclassResponsibility
 ]

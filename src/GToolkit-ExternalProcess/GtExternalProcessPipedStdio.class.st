@@ -14,6 +14,6 @@ Class {
 }
 
 { #category : #converting }
-GtExternalProcessPipedStdio >> asNativeStdioDuring: aBlock [
+GtExternalProcessPipedStdio >> asNativeStdioIn: aWorkingDirectory during: aBlock [
 	^ GtNativeExternalProcessStdioPiped newDuring: aBlock
 ]

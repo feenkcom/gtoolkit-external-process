@@ -184,6 +184,8 @@ GtNativeExternalProcessChild >> terminate [
 	<return: #Boolean>
 	| result |
 
+	OSPlatform current isWindows ifTrue: [ ^ self kill ].
+
 	result := self primKillWithSignal: 15.
 	"Read the process exit status, otherwise a defunct process will be left behind"
 	self primWait.

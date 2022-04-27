@@ -23,9 +23,15 @@ GtExternalProcessFileStdio >> append: anObject [
 ]
 
 { #category : #converting }
-GtExternalProcessFileStdio >> asNativeStdioDuring: aBlock [
+GtExternalProcessFileStdio >> asNativeStdioIn: aWorkingDirectory during: aBlock [
+	| aResolvedFileReference |
+	
+	aResolvedFileReference := self fileReference isAbsolute
+		ifTrue: [ self fileReference ]
+		ifFalse: [ (aWorkingDirectory resolveReference: self fileReference) asAbsolute  ].
+
 	^ GtNativeExternalProcessStdioFile
-		fromFileReference: self fileReference
+		fromFileReference: aResolvedFileReference
 		create: create
 		append: append
 		truncate: truncate
