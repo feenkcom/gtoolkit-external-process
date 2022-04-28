@@ -95,7 +95,8 @@ GtNativeExternalProcessChild >> kill [
 
 	result := self primKill.
 	"Read the process exit status, otherwise a defunct process will be left behind"
-	self primWait.
+	"The wait is never returning occasionally on linux, to be investigated"
+	"self primWait."
 	^ result.
 ]
 
@@ -188,7 +189,8 @@ GtNativeExternalProcessChild >> terminate [
 
 	result := self primKillWithSignal: 15.
 	"Read the process exit status, otherwise a defunct process will be left behind"
-	self primWait.
+	"The wait is never returning occasionally on linux, to be investigated"
+	"self primWait."
 	^ result.
 ]
 
