@@ -46,6 +46,11 @@ GtNativeExternalProcessChild class >> shutDown: quitting [
 		[ self sessionAnnouncer announce: GtExternalProcessShutdownAnnouncement new ].
 ]
 
+{ #category : #accessing }
+GtNativeExternalProcessChild class >> startUp: isNewSession [
+	"Overriden to prevent ExternalObject>>#startUp: from being executed twice"
+]
+
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> asynchronousStderr [
 	^ (GtNativeExternalAsynchronousStderr fromNativeHandle: (self primTakeAsynchronousStderr)) childProcess: self
