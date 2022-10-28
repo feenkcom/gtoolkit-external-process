@@ -25,7 +25,7 @@ GtNativeExternalProcessCommand class >> primNewCommand: aGtBoxerString [
 GtNativeExternalProcessCommand class >> primRelease: aHandle [
 	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
-	^ self ffiCall: #(void process_command_drop(void** aHandle))
+	^ self ffiCall: #(void process_command_drop(void* aHandle))
 ]
 
 { #category : #'api - command' }

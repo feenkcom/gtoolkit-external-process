@@ -16,7 +16,7 @@ GtNativeExternalAsynchronousBuffer class >> ffiLibrary [
 GtNativeExternalAsynchronousBuffer class >> primRelease: aHandle [
 	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
-	^ self ffiCall: #(void process_async_buffer_drop(void** aHandle))
+	^ self ffiCall: #(void process_async_buffer_drop(void* aHandle))
 ]
 
 { #category : #initialization }

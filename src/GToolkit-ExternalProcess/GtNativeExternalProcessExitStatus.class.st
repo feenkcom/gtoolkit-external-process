@@ -13,7 +13,7 @@ GtNativeExternalProcessExitStatus class >> ffiLibrary [
 GtNativeExternalProcessExitStatus class >> primRelease: aHandle [
 	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
-	^ self ffiCall: #(void process_exit_status_drop(void** aHandle))
+	^ self ffiCall: #(void process_exit_status_drop(void* aHandle))
 ]
 
 { #category : #accessing }
