@@ -1,13 +1,10 @@
 Class {
 	#name : #GtNativeExternalProcessOutput,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtExternalProcessLibrary',
+	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#category : #'GToolkit-ExternalProcess-External'
 }
-
-{ #category : #'library path' }
-GtNativeExternalProcessOutput class >> ffiLibrary [
-	^ GtExternalProcessLibrary
-]
 
 { #category : #'private - ffi' }
 GtNativeExternalProcessOutput class >> primRelease: aHandle [
@@ -46,19 +43,19 @@ GtNativeExternalProcessOutput >> stderr [
 { #category : #accessing }
 GtNativeExternalProcessOutput >> stderrBytes [
 	<return: #ByteArray>
-
-	^ GtBoxerArrayU8
-		fromNativeHandle: self primtGetStderr
+	
+	^ self ffiLibrary
+		newArrayU8FromHandle: self primtGetStderr
 		during: [ :anArrayU8 | anArrayU8 asByteArray ]
 ]
 
 { #category : #accessing }
 GtNativeExternalProcessOutput >> stderrString [
 	<return: #String>
-
-	^ GtBoxerString
-		fromNativeHandle: self primtGetStderrString
-		during: [ :aBoxerString | aBoxerString string ]
+	
+	^ self ffiLibrary
+		newStringFromHandle: self primtGetStderrString
+		during: [ :aStringBox | aStringBox string ]
 ]
 
 { #category : #accessing }
@@ -72,8 +69,8 @@ GtNativeExternalProcessOutput >> stdout [
 GtNativeExternalProcessOutput >> stdoutBytes [
 	<return: #ByteArray>
 
-	^ GtBoxerArrayU8
-		fromNativeHandle: self primtGetStdout
+	^ self ffiLibrary
+		newArrayU8FromHandle: self primtGetStdout
 		during: [ :anArrayU8 | anArrayU8 asByteArray ]
 ]
 
@@ -81,7 +78,7 @@ GtNativeExternalProcessOutput >> stdoutBytes [
 GtNativeExternalProcessOutput >> stdoutString [
 	<return: #String>
 
-	^ GtBoxerString
-		fromNativeHandle: self primtGetStdoutString
-		during: [ :aBoxerString | aBoxerString string ]
+	^ self ffiLibrary
+		newStringFromHandle: self primtGetStdoutString
+		during: [ :aStringBox | aStringBox string ]
 ]

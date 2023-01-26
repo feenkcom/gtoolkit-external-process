@@ -1,6 +1,8 @@
 Class {
 	#name : #GtExternalProcessLibrary,
 	#superclass : #FFILibrary,
+	#traits : 'TGtWithStringBox + TGtWithArrayBoxU8',
+	#classTraits : 'TGtWithStringBox classTrait + TGtWithArrayBoxU8 classTrait',
 	#category : #'GToolkit-ExternalProcess-Library'
 }
 

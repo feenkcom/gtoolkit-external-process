@@ -1,24 +1,21 @@
 Class {
 	#name : #GtNativeExternalProcessCommand,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtExternalProcessLibrary',
+	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#category : #'GToolkit-ExternalProcess-External'
 }
 
-{ #category : #'library path' }
-GtNativeExternalProcessCommand class >> ffiLibrary [
-	^ GtExternalProcessLibrary
-]
-
 { #category : #'instance creation' }
 GtNativeExternalProcessCommand class >> new: aCommandName [
-	^ GtBoxerString
-		fromString: aCommandName
-		during: [ :aGtBoxerString | self fromNativeHandle: (self primNewCommand: aGtBoxerString) ]
+	^ self ffiLibrary
+		newString: aCommandName
+		during: [ :aStringBox | self fromNativeHandle: (self primNewCommand: aStringBox) ]
 ]
 
 { #category : #'private -ffi' }
-GtNativeExternalProcessCommand class >> primNewCommand: aGtBoxerString [
-	^ self ffiCall: #(void* process_command_new(GtBoxerString aGtBoxerString))
+GtNativeExternalProcessCommand class >> primNewCommand: aStringBox [
+	^ self ffiCall: #(void* process_command_new(GtStringBox aStringBox))
 ]
 
 { #category : #'private - ffi' }
@@ -30,9 +27,9 @@ GtNativeExternalProcessCommand class >> primRelease: aHandle [
 
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> arg: anArgument [
-	GtBoxerString
-		fromString: anArgument
-		during: [ :aGtBoxerString | self primArg: aGtBoxerString ]
+	self ffiLibrary
+		newString: anArgument
+		during: [ :aStringBox | self primArg: aStringBox ]
 ]
 
 { #category : #'api - command' }
@@ -46,8 +43,8 @@ GtNativeExternalProcessCommand >> output [
 ]
 
 { #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primArg: aGtBoxerString [
-	^ self ffiCall: #(void process_command_arg(self, GtBoxerString aGtBoxerString))
+GtNativeExternalProcessCommand >> primArg: aStringBox [
+	^ self ffiCall: #(void process_command_arg(self, GtStringBox aStringBox))
 ]
 
 { #category : #'private - ffi' }
@@ -57,7 +54,7 @@ GtNativeExternalProcessCommand >> primClearEnv [
 
 { #category : #'private - ffi' }
 GtNativeExternalProcessCommand >> primCurrentDirectory: aPathString [
-	^ self ffiCall: #(void process_command_current_dir(self, GtBoxerString aPathString))
+	^ self ffiCall: #(void process_command_current_dir(self, GtStringBox aPathString))
 ]
 
 { #category : #'private - ffi' }
@@ -66,13 +63,16 @@ GtNativeExternalProcessCommand >> primOutput [
 ]
 
 { #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primRemoveEnvKey: aGtBoxerStringKey [
-	^ self ffiCall: #(void process_command_env_remove(self, GtBoxerString aGtBoxerStringKey))
+GtNativeExternalProcessCommand >> primRemoveEnvKey: aKeyString [
+	^ self ffiCall: #(void process_command_env_remove(self, GtStringBox aKeyString))
 ]
 
 { #category : #'private - ffi' }
-GtNativeExternalProcessCommand >> primSetEnvKey: aGtBoxerStringKey value: aGtBoxerStringValue [
-	^ self ffiCall: #(void process_command_env(self, GtBoxerString aGtBoxerStringKey, GtBoxerString aGtBoxerStringValue))
+GtNativeExternalProcessCommand >> primSetEnvKey: aKeyString value: aValueString [
+	^ self ffiCall: #(void process_command_env(
+		self,
+		GtStringBox aKeyString,
+		GtStringBox aValueString))
 ]
 
 { #category : #'private - ffi' }
@@ -111,9 +111,9 @@ GtNativeExternalProcessCommand >> removeEnv: aNameString [
 		assert: [ aNameString isString and: [ aNameString isSymbol not ] ]
 		description: [ 'Env.var name must be a String but was {1}' format: { aNameString class name } ].
 
-	GtBoxerString
-		fromString: aNameString
-		during: [ :aGtBoxerStringKey | self primRemoveEnvKey: aGtBoxerStringKey ]
+	self ffiLibrary
+		newString: aNameString
+		during: [ :aStringBox | self primRemoveEnvKey: aStringBox ]
 ]
 
 { #category : #'api - command' }
@@ -121,18 +121,18 @@ GtNativeExternalProcessCommand >> setEnv: aNameString value: aValueString [
 	self
 		assert: [ aNameString isString and: [ aNameString isSymbol not ] ]
 		description: [ 'Env.var name must be a String but was {1}' format: { aNameString class name } ].
-		
+
 	self
 		assert: [ aValueString isString and: [ aValueString isSymbol not ] ]
 		description: [ 'Env.var value must be a String but was {1}' format: { aValueString class name } ].
 
-	GtBoxerString
-		fromString: aNameString
-		during: [ :aGtBoxerStringKey | 
-			GtBoxerString
-				fromString: aValueString
-				during: [ :aGtBoxerStringValue | 
-					self primSetEnvKey: aGtBoxerStringKey value: aGtBoxerStringValue ] ]
+	self ffiLibrary
+		newString: aNameString
+		during: [ :aKeyStringBox |
+			self ffiLibrary
+				newString: aValueString
+				during: [ :aValueStringBox |
+					self primSetEnvKey: aKeyStringBox value: aValueStringBox ] ]
 ]
 
 { #category : #'api - command' }
@@ -170,7 +170,7 @@ GtNativeExternalProcessCommand >> windowsProcessCreationFlags: aNumber [
 
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> workingDirectory: aFileReference [
-	GtBoxerString
-		fromString: aFileReference fullName
-		during: [ :aBoxerString | self primCurrentDirectory: aBoxerString ]
+	self ffiLibrary
+		newString: aFileReference fullName
+		during: [ :aStringBox | self primCurrentDirectory: aStringBox ]
 ]
