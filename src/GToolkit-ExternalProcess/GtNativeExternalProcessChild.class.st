@@ -1,6 +1,8 @@
 Class {
 	#name : #GtNativeExternalProcessChild,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtExternalProcessLibrary',
+	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#instVars : [
 		'pollDuration'
 	],
@@ -9,11 +11,6 @@ Class {
 	],
 	#category : #'GToolkit-ExternalProcess-External'
 }
-
-{ #category : #'library path' }
-GtNativeExternalProcessChild class >> ffiLibrary [
-	^ GtExternalProcessLibrary
-]
 
 { #category : #initialization }
 GtNativeExternalProcessChild class >> initialize [ 

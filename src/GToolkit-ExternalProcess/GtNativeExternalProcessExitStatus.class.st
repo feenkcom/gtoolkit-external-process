@@ -1,13 +1,10 @@
 Class {
 	#name : #GtNativeExternalProcessExitStatus,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtExternalProcessLibrary',
+	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#category : #'GToolkit-ExternalProcess-External'
 }
-
-{ #category : #'library path' }
-GtNativeExternalProcessExitStatus class >> ffiLibrary [
-	^ GtExternalProcessLibrary
-]
 
 { #category : #'private - ffi' }
 GtNativeExternalProcessExitStatus class >> primRelease: aHandle [

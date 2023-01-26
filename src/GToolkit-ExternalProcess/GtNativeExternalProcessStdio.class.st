@@ -1,13 +1,10 @@
 Class {
 	#name : #GtNativeExternalProcessStdio,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtExternalProcessLibrary',
+	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#category : #'GToolkit-ExternalProcess-External'
 }
-
-{ #category : #accessing }
-GtNativeExternalProcessStdio class >> ffiLibrary [
-	^ GtExternalProcessLibrary
-]
 
 { #category : #'private - ffi' }
 GtNativeExternalProcessStdio class >> primRelease: aHandle [

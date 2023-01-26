@@ -15,9 +15,9 @@ GtNativeExternalProcessStdioFile class >> fromFileReference: anAbsoluteFileRefer
 ]
 
 { #category : #'private - ffi' }
-GtNativeExternalProcessStdioFile class >> primCreate: aFileNameBoxerString create: shouldCreate append: shouldAppend truncate: shouldTruncate [
+GtNativeExternalProcessStdioFile class >> primCreate: aFileNameString create: shouldCreate append: shouldAppend truncate: shouldTruncate [
 	^ self ffiCall: #(void* process_stdio_file(
-		GtBoxerString aFileNameBoxerString,
+		GtStringBox aFileNameString,
 		bool shouldCreate,
 		bool shouldAppend,
 		bool shouldTruncate))
@@ -33,11 +33,11 @@ GtNativeExternalProcessStdioFile class >> primFromFileReference: anAbsoluteFileR
 		"When using a working directory, the file location must not be ambiguous."
 		ifFalse: [ self error: ('File reference must be resolved as absolute, but was {1}' format: { anAbsoluteFileReference }) ].
 	
-	^ GtBoxerString
-		fromString: anAbsoluteFileReference fullName
-		during: [ :aBoxerString |
+	^ self ffiLibrary
+		newString: anAbsoluteFileReference fullName
+		during: [ :aStringBox |
 			self
-				primCreate: aBoxerString
+				primCreate: aStringBox
 				create: shouldCreate
 				append: shouldAppend
 				truncate: shouldTruncate ]

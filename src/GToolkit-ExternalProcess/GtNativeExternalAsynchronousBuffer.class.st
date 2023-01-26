@@ -1,16 +1,13 @@
 Class {
 	#name : #GtNativeExternalAsynchronousBuffer,
 	#superclass : #GtBoxerValueBox,
+	#traits : 'TGtExternalProcessLibrary',
+	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#instVars : [
 		'childProcess'
 	],
 	#category : #'GToolkit-ExternalProcess-External'
 }
-
-{ #category : #'library path' }
-GtNativeExternalAsynchronousBuffer class >> ffiLibrary [
-	^ GtExternalProcessLibrary
-]
 
 { #category : #'private - ffi' }
 GtNativeExternalAsynchronousBuffer class >> primRelease: aHandle [
@@ -27,8 +24,8 @@ GtNativeExternalAsynchronousBuffer >> childProcess: anObject [
 
 { #category : #'api - buffer' }
 GtNativeExternalAsynchronousBuffer >> pollString [
-	^ GtBoxerString
-		fromNativeHandle: self primPollString
+	^ self ffiLibrary
+		newStringFromHandle: self primPollString
 		during: [ :aGtBoxerString | aGtBoxerString string ]
 ]
 
