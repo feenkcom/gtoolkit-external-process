@@ -4,7 +4,9 @@ Class {
 	#traits : 'TGtExternalProcessLibrary',
 	#classTraits : 'TGtExternalProcessLibrary classTrait',
 	#instVars : [
-		'pollDuration'
+		'pollDuration',
+		'mutex',
+		'stdin'
 	],
 	#classVars : [
 		'SessionAnnouncer'
@@ -48,12 +50,12 @@ GtNativeExternalProcessChild class >> startUp: isNewSession [
 	"Overriden to prevent ExternalObject>>#startUp: from being executed twice"
 ]
 
-{ #category : #'api - process' }
+{ #category : #'api - stdio' }
 GtNativeExternalProcessChild >> asynchronousStderr [
 	^ (GtNativeExternalAsynchronousStderr fromNativeHandle: (self primTakeAsynchronousStderr)) childProcess: self
 ]
 
-{ #category : #'api - process' }
+{ #category : #'api - stdio' }
 GtNativeExternalProcessChild >> asynchronousStdout [
 	^ (GtNativeExternalAsynchronousStdout fromNativeHandle: (self primTakeAsynchronousStdout)) childProcess: self
 ]
@@ -75,6 +77,13 @@ GtNativeExternalProcessChild >> gtSummaryFor: aView [
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> id [
 	^ self primId
+]
+
+{ #category : #initialization }
+GtNativeExternalProcessChild >> initialize [
+	super initialize.
+	
+	mutex := Monitor new
 ]
 
 { #category : #testing }
@@ -133,6 +142,16 @@ GtNativeExternalProcessChild >> primTakeAsynchronousStdout [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primTakeStdin [
+	^ self ffiCall: #(void* process_child_take_stdin(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primTakeStdout [
+	^ self ffiCall: #(void* process_child_take_stdout(self))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primTryWait [
 	^ self ffiCall: #(void* process_child_try_wait(self))
 ]
@@ -161,6 +180,15 @@ GtNativeExternalProcessChild >> signal: aSignalValue [
 	<return: #Boolean>
 
 	^ self primKillWithSignal: aSignalValue
+]
+
+{ #category : #'api - stdio' }
+GtNativeExternalProcessChild >> stdin [
+	"Try to get child's stdin handle. Please note, that the returned handle may be null if child's stdin is already
+	consumed or if child does not have stdin"
+	<return: #GtNativeExternalProcessChildStdin>
+
+	^ mutex critical: [ stdin ifNil: [ stdin := GtNativeExternalProcessChildStdin fromNativeHandle: self primTakeStdin ] ]
 ]
 
 { #category : #ui }
