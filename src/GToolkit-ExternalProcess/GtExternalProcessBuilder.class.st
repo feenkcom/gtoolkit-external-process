@@ -354,6 +354,17 @@ GtExternalProcessBuilder >> stdout: aGtExternalProcessStdio [
 	stdout := aGtExternalProcessStdio
 ]
 
+{ #category : #'api - stdio' }
+GtExternalProcessBuilder >> stdoutToStdin: anExternalProcessChild [
+	"Set the child to read the standard input (stdin) from a an stdout of a given spawed external process."
+	
+	self
+		assert: [ anExternalProcessChild isKindOf: GtNativeExternalProcessChild ]
+		description: [ 'In order to pipe an stdout to stdin a process must be #spawn-ed' ].
+
+	self stdin: (GtExternalProcessStdoutToStdio new externalProcessChild: anExternalProcessChild)
+]
+
 { #category : #accessing }
 GtExternalProcessBuilder >> workingDirectory [
 	<return: #FileReference>

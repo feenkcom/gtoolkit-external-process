@@ -57,6 +57,31 @@ GtExternalProcessExamples >> inheritedHelloWorld [
 ]
 
 { #category : #'examples - stdio' }
+GtExternalProcessExamples >> pipeStdoutToStdin [
+	<gtExample>
+	<noTest>
+	| parent output stdout |
+	
+	OSPlatform current isWindows
+		ifTrue: [ ^ '' ].
+
+	parent := (GtExternalProcessBuilder new: 'echo')
+		arg: 'hello';
+		pipeStdout;
+		spawn.
+
+	output := (GtExternalProcessBuilder new: 'wc')
+		arg: '-m';
+		stdoutToStdin: parent;
+		output.
+
+	stdout := output stdoutString trimBoth.
+	self assert: stdout equals: '6'.
+	
+	^ stdout
+]
+
+{ #category : #'examples - stdio' }
 GtExternalProcessExamples >> pipedHelloWorld [
 	<gtExample>
 	<noTest>
@@ -99,4 +124,30 @@ GtExternalProcessExamples >> setAndEchoEnvVar [
 	self assert: anStdout equals: 'hello'.
 	
 	^ anStdout
+]
+
+{ #category : #'examples - stdio' }
+GtExternalProcessExamples >> writeToStdin [
+	<gtExample>
+	<noTest>
+	| process stdout |
+	
+	OSPlatform current isWindows
+		ifTrue: [ ^ '' ].
+
+	process := (GtExternalProcessBuilder new: 'wc')
+		arg: '-c';
+		pipeStdin;
+		pipeStdout;
+		spawn.
+
+	process stdin
+		nextPutAll: 'hello';
+		close.
+
+	stdout := process waitWithOutput stdout trimBoth.
+		
+	self assert: stdout equals: '5'.
+	
+	^ stdout
 ]

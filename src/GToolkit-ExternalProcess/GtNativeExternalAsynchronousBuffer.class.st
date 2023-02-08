@@ -1,8 +1,6 @@
 Class {
 	#name : #GtNativeExternalAsynchronousBuffer,
-	#superclass : #GtBoxerValueBox,
-	#traits : 'TGtExternalProcessLibrary',
-	#classTraits : 'TGtExternalProcessLibrary classTrait',
+	#superclass : #GtNativeExternalProcessChildStdio,
 	#instVars : [
 		'childProcess'
 	],
