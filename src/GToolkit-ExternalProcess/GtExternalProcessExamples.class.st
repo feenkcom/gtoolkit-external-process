@@ -59,7 +59,6 @@ GtExternalProcessExamples >> inheritedHelloWorld [
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> pipeStdoutToStdin [
 	<gtExample>
-	<noTest>
 	| parent output stdout |
 	
 	OSPlatform current isWindows
@@ -129,7 +128,6 @@ GtExternalProcessExamples >> setAndEchoEnvVar [
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> writeToStdin [
 	<gtExample>
-	<noTest>
 	| process stdout |
 	
 	OSPlatform current isWindows
