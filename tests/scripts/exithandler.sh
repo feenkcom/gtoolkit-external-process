@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Print to stdout an indication of whether the scripts exit handler has been 
 # called or not.
