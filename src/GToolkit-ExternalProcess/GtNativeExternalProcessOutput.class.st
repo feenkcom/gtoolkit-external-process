@@ -8,9 +8,47 @@ Class {
 
 { #category : #'private - ffi' }
 GtNativeExternalProcessOutput class >> primRelease: aHandle [
-	
 	"Plain pointers must be deleted using delete(), all users must implement a specific method"
 	^ self ffiCall: #(void process_output_drop(void* aHandle))
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessOutput >> gtStatusFor: aView [
+	<gtView>
+	
+	^ aView forward
+		title: 'Status';
+		priority: 4;
+		object: [ self status ];
+		view: #gtInfoFor:
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessOutput >> gtStderrFor: aView [
+	<gtView>
+	
+	self stderrString
+		ifEmpty: [ ^ aView empty ].
+	
+	^ aView text
+		title: 'Stderr';
+		priority: 2;
+		text: [ self stderrString asRopedText glamorousCodeFont ]
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessOutput >> gtStdoutFor: aView [
+	<gtView>
+	
+	^ aView text
+		title: 'Stdout';
+		priority: 3;
+		text: [ self stdoutString asRopedText glamorousCodeFontAndSmallSize ]
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessOutput >> primtGetStatus [
+	^ self ffiCall: #(void* process_output_status(self))
 ]
 
 { #category : #'private - ffi' }
@@ -31,6 +69,13 @@ GtNativeExternalProcessOutput >> primtGetStdout [
 { #category : #'private - ffi' }
 GtNativeExternalProcessOutput >> primtGetStdoutString [
 	^ self ffiCall: #(void* process_output_stdout_string(self))
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessOutput >> status [
+	<return: #String>
+
+	^ GtNativeExternalProcessExitStatus fromNativeHandle: self primtGetStatus
 ]
 
 { #category : #accessing }
