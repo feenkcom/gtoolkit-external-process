@@ -112,6 +112,11 @@ GtNativeExternalProcessChild >> kill [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primAsyncWaitWithOutputSignaller: aSemaphoreSignaller semaphoreIndex: aSemaphoreIndex [
+	^ self ffiCall: #(void* process_child_async_wait_with_output(self, void* aSemaphoreSignaller, size_t aSemaphoreIndex))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primId [
 	^ self ffiCall: #(uint32 process_child_id(self))
 ]
@@ -164,6 +169,13 @@ GtNativeExternalProcessChild >> primWait [
 { #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primWaitWithOutput [
 	^ self ffiCall: #(void* process_child_wait_with_output(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primitiveGetSemaphoreSignaller [
+	<primitive: 'primitiveGetSemaphoreSignaller'>
+
+	^ ExternalAddress null
 ]
 
 { #category : #private }
@@ -252,6 +264,29 @@ GtNativeExternalProcessChild >> wait [
 ]
 
 { #category : #'api - process' }
+GtNativeExternalProcessChild >> waitAsyncWithOutput [
+	<return: #GtNativeExternalProcessOutput>
+	| aSemaphoreSignaller aSemaphore aSemaphoreIndex |
+	
+	aSemaphoreSignaller := self primitiveGetSemaphoreSignaller.
+	aSemaphoreSignaller isNull
+		ifTrue: [ self error: 'Semaphore signaller is not available in the current virtual machine.' ].
+	
+	aSemaphore := Semaphore new.
+	aSemaphoreIndex := Smalltalk registerExternalObject: aSemaphore.
+	
+	^ GtNativeExternalProcessAsyncOutput
+		fromNativeHandle: (self primAsyncWaitWithOutputSignaller: aSemaphoreSignaller semaphoreIndex: aSemaphoreIndex)
+		during: [ :anAsyncOutput |
+			| anOutput |
+			aSemaphore wait.
+			Smalltalk unregisterExternalObject: aSemaphore.
+			anOutput := anAsyncOutput takeOutput.
+			self release.
+			anOutput ]
+]
+
+{ #category : #'api - process' }
 GtNativeExternalProcessChild >> waitForExitDoing: aBlock [
 	"Wait for the process to exit, evaluating the block every pollDuration seconds"
 
@@ -262,6 +297,7 @@ GtNativeExternalProcessChild >> waitForExitDoing: aBlock [
 
 { #category : #'api - process' }
 GtNativeExternalProcessChild >> waitWithOutput [
+	<return: #GtNativeExternalProcessOutput>
 	| anOutput |
 	
 	anOutput := GtNativeExternalProcessOutput fromNativeHandle: self primWaitWithOutput.
