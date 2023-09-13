@@ -282,23 +282,8 @@ GtExternalProcessBuilder >> output [
 	resulting output). Stdin is not inherited from the parent and any
 	attempt by the child process to read from the stdin stream will result
 	in the stream immediately closing."
-	
-	| anExternalCommand |
-	
-	anExternalCommand := self createNativeCommand.
-	
-	"until we get a VM release"
-	true
-		ifTrue: [ ^ anExternalCommand output ].
-	
-	GtExternalProcessPipedStdio new
-		asNativeStdioIn: self workingDirectory
-		during: [ :anStdio | anExternalCommand stdout: anStdio ].
-	GtExternalProcessPipedStdio new
-		asNativeStdioIn: self workingDirectory
-		during: [ :anStdio | anExternalCommand stderr: anStdio ].
 
-	^ anExternalCommand spawn waitAsyncWithOutput
+	^ self createNativeCommand output
 ]
 
 { #category : #'api - stdio' }
