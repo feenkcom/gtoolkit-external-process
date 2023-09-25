@@ -21,6 +21,13 @@ GtNativeExternalAsynchronousBuffer >> childProcess: anObject [
 ]
 
 { #category : #'api - buffer' }
+GtNativeExternalAsynchronousBuffer >> pollBytes [
+	^ self ffiLibrary
+		newArrayU8FromHandle: self primPollBytes
+		during: [ :aGtBoxerArray | aGtBoxerArray asByteArray ]
+]
+
+{ #category : #'api - buffer' }
 GtNativeExternalAsynchronousBuffer >> pollString [
 	^ self ffiLibrary
 		newStringFromHandle: self primPollString
@@ -43,6 +50,11 @@ GtNativeExternalAsynchronousBuffer >> pollStringEvery: aDuration do: aBlock [
 				ifNotEmpty: [ :aString | aBlock value: aString ].
 			aDuration wait ].
 	] fork
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalAsynchronousBuffer >> primPollBytes [
+	^ self ffiCall: #(void* process_async_buffer_poll(self))
 ]
 
 { #category : #'private - ffi' }
