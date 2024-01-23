@@ -236,6 +236,26 @@ GtNativeExternalProcessChild >> terminate [
 	^ result.
 ]
 
+{ #category : #'api - process' }
+GtNativeExternalProcessChild >> terminateAll [
+	"Variant of #terminate to also terminate all child processes.
+	Return true if it was succesful. 
+	If the child has already exited, false is returned."
+	<return: #Boolean>
+	OSPlatform current isWindows 
+		ifTrue: [
+			"Use TASKKILL with
+				/F [Specifies that processes be forcefully ended]
+				/T [Ends the specified process and any child processes started by it]"
+			^ GtSubprocessWithInMemoryOutput new
+				command: 'taskkill';
+				arguments: {'/F' . '/T' . '/PID' . self id asString };
+				runAndWait;
+				isSuccess ].
+	"Assume the normal #terminate already does the right thing"
+	^ self terminate
+]
+
 { #category : #'system startup & shutdown' }
 GtNativeExternalProcessChild >> terminateOnShutdown [
 	"Register the receiver to be killed when Pharo exits"
