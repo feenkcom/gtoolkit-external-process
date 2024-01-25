@@ -253,6 +253,7 @@ GtNativeExternalProcessChild >> terminateAll [
 				runAndWait;
 				isSuccess ].
 	"Assume the normal #terminate already does the right thing"
+	"Note however that the regular terminate is not a forced kill"
 	^ self terminate
 ]
 
