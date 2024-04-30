@@ -40,14 +40,16 @@ GtNativeExternalAsynchronousBuffer >> pollStringEvery: aDuration do: aBlock [
 		| shouldStop |
 		
 		shouldStop := false.
-		[ shouldStop not ] whileTrue: [
+		[ shouldStop ] whileFalse: [
 			| aPolledString |
 
 			aPolledString := self pollString.
-			aPolledString ifEmpty: [
-				childProcess isTerminated
-					ifTrue: [ shouldStop := true ] ]
-				ifNotEmpty: [ :aString | aBlock value: aString ].
+			aPolledString 
+				ifEmpty: [
+					childProcess isTerminated
+						ifTrue: [ shouldStop := true ] ]
+				ifNotEmpty: [ :aString | 
+					aBlock value: aString ].
 			aDuration wait ].
 	] fork
 ]
