@@ -27,13 +27,10 @@ GtNativeExternalProcessOutput >> gtStatusFor: aView [
 GtNativeExternalProcessOutput >> gtStderrFor: aView [
 	<gtView>
 	
-	self stderrString
-		ifEmpty: [ ^ aView empty ].
-	
 	^ aView text
 		title: 'Stderr';
-		priority: 2;
-		text: [ self stderrString asRopedText glamorousCodeFont ]
+		priority: 3;
+		text: [ self stderrStringLossy asRopedText glamorousCodeFont ]
 ]
 
 { #category : #accessing }
@@ -42,8 +39,8 @@ GtNativeExternalProcessOutput >> gtStdoutFor: aView [
 	
 	^ aView text
 		title: 'Stdout';
-		priority: 3;
-		text: [ self stdoutString asRopedText glamorousCodeFontAndSmallSize ]
+		priority: 2;
+		text: [ self stdoutStringLossy asRopedText glamorousCodeFontAndSmallSize ]
 ]
 
 { #category : #'private - ffi' }
@@ -62,6 +59,11 @@ GtNativeExternalProcessOutput >> primtGetStderrString [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessOutput >> primtGetStderrStringLossy [
+	^ self ffiCall: #(void* process_output_stderr_string_lossy(self))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessOutput >> primtGetStdout [
 	^ self ffiCall: #(void* process_output_stdout(self))
 ]
@@ -69,6 +71,11 @@ GtNativeExternalProcessOutput >> primtGetStdout [
 { #category : #'private - ffi' }
 GtNativeExternalProcessOutput >> primtGetStdoutString [
 	^ self ffiCall: #(void* process_output_stdout_string(self))
+]
+
+{ #category : #'private - ffi' }
+GtNativeExternalProcessOutput >> primtGetStdoutStringLossy [
+	^ self ffiCall: #(void* process_output_stdout_string_lossy(self))
 ]
 
 { #category : #accessing }
@@ -82,7 +89,7 @@ GtNativeExternalProcessOutput >> status [
 GtNativeExternalProcessOutput >> stderr [
 	<return: #String>
 
-	^ self stderrString
+	^ self stderrStringLossy
 ]
 
 { #category : #accessing }
@@ -104,10 +111,19 @@ GtNativeExternalProcessOutput >> stderrString [
 ]
 
 { #category : #accessing }
+GtNativeExternalProcessOutput >> stderrStringLossy [
+	<return: #String>
+	
+	^ self ffiLibrary
+		newStringFromHandle: self primtGetStderrStringLossy
+		during: [ :aStringBox | aStringBox string ]
+]
+
+{ #category : #accessing }
 GtNativeExternalProcessOutput >> stdout [
 	<return: #String>
 
-	^ self stdoutString
+	^ self stdoutStringLossy
 ]
 
 { #category : #accessing }
@@ -121,9 +137,21 @@ GtNativeExternalProcessOutput >> stdoutBytes [
 
 { #category : #accessing }
 GtNativeExternalProcessOutput >> stdoutString [
+	"Attempts to convert the output bytes to a UTF-8 string.
+	Returns an empty string if bytes represented a malformed UTF8 String"
 	<return: #String>
 
 	^ self ffiLibrary
 		newStringFromHandle: self primtGetStdoutString
+		during: [ :aStringBox | aStringBox string ]
+]
+
+{ #category : #accessing }
+GtNativeExternalProcessOutput >> stdoutStringLossy [
+	"Converts the output bytes to UTF-8 encodede string replacing including invalid characters."
+	<return: #String>
+
+	^ self ffiLibrary
+		newStringFromHandle: self primtGetStdoutStringLossy
 		during: [ :aStringBox | aStringBox string ]
 ]
