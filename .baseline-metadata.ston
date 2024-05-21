@@ -1,1 +1,6 @@
-{	"repositories" : {		"github://feenkcom/gtoolkit-examples/src" : "v0.8.93",		"github://feenkcom/gtoolkit-boxer/boxer-bindings" : "v0.8.53"	}}
+{
+	"repositories" : {
+		"github://feenkcom/gtoolkit-examples/src" : "v0.8.94",
+		"github://feenkcom/gtoolkit-boxer/boxer-bindings" : "v0.8.53"
+	}
+}
