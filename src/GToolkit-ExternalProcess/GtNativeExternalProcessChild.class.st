@@ -247,11 +247,10 @@ GtNativeExternalProcessChild >> terminateAll [
 			"Use TASKKILL with
 				/F [Specifies that processes be forcefully ended]
 				/T [Ends the specified process and any child processes started by it]"
-			^ GtSubprocessWithInMemoryOutput new
+			^ (GtExternalProcessBuilder new
 				command: 'taskkill';
 				arguments: {'/F' . '/T' . '/PID' . self id asString };
-				runAndWait;
-				isSuccess ].
+				output) status isSuccess ].
 	"Assume the normal #terminate already does the right thing"
 	"Note however that the regular terminate is not a forced kill"
 	^ self terminate
