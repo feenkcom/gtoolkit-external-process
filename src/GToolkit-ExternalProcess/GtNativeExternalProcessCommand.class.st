@@ -137,7 +137,14 @@ GtNativeExternalProcessCommand >> setEnv: aNameString value: aValueString [
 
 { #category : #'api - command' }
 GtNativeExternalProcessCommand >> spawn [
-	^ GtNativeExternalProcessChild fromNativeHandle: self primSpawn
+	| processChild |
+	
+	processChild := GtNativeExternalProcessChild fromNativeHandle: self primSpawn.
+	(processChild isTerminated and: [ processChild tryWait isNil ])
+		ifTrue: [ GtExternalProcessFailedToStart new 
+			child: processChild;
+			signal ].
+	^ processChild
 ]
 
 { #category : #'api - command' }
