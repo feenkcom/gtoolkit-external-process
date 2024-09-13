@@ -131,13 +131,14 @@ GtExternalProcessExamples >> stdoutStream [
 	| process lines |
 	
 	process := GtExternalProcessBuilder new
-		command: 'date';
+		command: 'echo';
+		arg: 'hello world';
 		pipeStdout;
 		spawn.
 
 	lines := process stdoutStream lines toArray wait.
 	self assert: lines size equals: 1.
-	self assert: lines first isNotEmpty.
+	self assert: lines first equals: 'hello world'.
 
 	^ lines
 ]
