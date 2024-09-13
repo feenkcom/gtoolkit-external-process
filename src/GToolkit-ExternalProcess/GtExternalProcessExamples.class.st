@@ -126,6 +126,23 @@ GtExternalProcessExamples >> setAndEchoEnvVar [
 ]
 
 { #category : #'examples - stdio' }
+GtExternalProcessExamples >> stdoutStream [
+	<gtExample>
+	| process lines |
+	
+	process := GtExternalProcessBuilder new
+		command: 'date';
+		pipeStdout;
+		spawn.
+
+	lines := process stdoutStream lines toArray wait.
+	self assert: lines size equals: 1.
+	self assert: lines first isNotEmpty.
+
+	^ lines
+]
+
+{ #category : #'examples - stdio' }
 GtExternalProcessExamples >> writeToStdin [
 	<gtExample>
 	| process stdout |
