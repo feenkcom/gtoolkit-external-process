@@ -147,6 +147,14 @@ GtNativeExternalProcessChild >> primTakeAsynchronousStdout [
 ]
 
 { #category : #'private - ffi' }
+GtNativeExternalProcessChild >> primTakeAsynchronousStdoutWithSignaller: aSemaphoreSignaller semaphoreIndex: aSemaphoreIndex [
+	^ self ffiCall: #(void* process_child_take_asynchronous_stdout_with_semaphore(
+		self,
+		void* aSemaphoreSignaller,
+		size_t aSemaphoreIndex))
+]
+
+{ #category : #'private - ffi' }
 GtNativeExternalProcessChild >> primTakeStdin [
 	^ self ffiCall: #(void* process_child_take_stdin(self))
 ]
@@ -201,6 +209,27 @@ GtNativeExternalProcessChild >> stdin [
 	<return: #GtNativeExternalProcessChildStdin>
 
 	^ mutex critical: [ stdin ifNil: [ stdin := GtNativeExternalProcessChildStdin fromNativeHandle: self primTakeStdin ] ]
+]
+
+{ #category : #'api - stdio' }
+GtNativeExternalProcessChild >> stdoutStream [
+	"Return an asynchronous stream of stdout characters. The returned stream
+	doesn't poll all output into the image, but rather loads it in chunks upon request."
+	<return: #TAsyncStream>
+
+	| aSemaphore aSemaphoreIndex anExternalOutput |
+	aSemaphore := Semaphore new.
+	aSemaphoreIndex := Smalltalk registerExternalObject: aSemaphore.
+
+	anExternalOutput := (GtNativeExternalAsynchronousStdout
+			fromNativeHandle: (self
+					primTakeAsynchronousStdoutWithSignaller: self primitiveGetSemaphoreSignaller
+					semaphoreIndex: aSemaphoreIndex)) childProcess: self.
+
+	^ GtExternalProcessStdoutStream
+		externalOutput: anExternalOutput
+		semaphore: aSemaphore
+		semaphoreIndex: aSemaphoreIndex
 ]
 
 { #category : #ui }

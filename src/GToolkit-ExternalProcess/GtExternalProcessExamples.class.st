@@ -126,6 +126,27 @@ GtExternalProcessExamples >> setAndEchoEnvVar [
 ]
 
 { #category : #'examples - stdio' }
+GtExternalProcessExamples >> stdoutStream [
+	<gtExample>
+	| process lines |
+	
+	OSPlatform current isWindows
+		ifTrue: [ ^ #() ].
+	
+	process := GtExternalProcessBuilder new
+		command: 'echo';
+		arg: 'hello world';
+		pipeStdout;
+		spawn.
+
+	lines := process stdoutStream lines toArray wait.
+	self assert: lines size equals: 1.
+	self assert: lines first equals: 'hello world'.
+
+	^ lines
+]
+
+{ #category : #'examples - stdio' }
 GtExternalProcessExamples >> writeToStdin [
 	<gtExample>
 	| process stdout |
