@@ -130,6 +130,9 @@ GtExternalProcessExamples >> stdoutStream [
 	<gtExample>
 	| process lines |
 	
+	OSPlatform current isWindows
+		ifTrue: [ ^ #() ].
+	
 	process := GtExternalProcessBuilder new
 		command: 'echo';
 		arg: 'hello world';
