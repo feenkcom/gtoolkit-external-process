@@ -55,7 +55,7 @@ GtExternalProcessOutputStream >> ensureBufferProcess [
 				resume ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 GtExternalProcessOutputStream >> initialize [
 	super initialize.
 	

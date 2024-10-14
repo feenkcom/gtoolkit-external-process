@@ -21,3 +21,13 @@ GtNativeExternalProcessAsyncOutput >> primTakeOutput [
 GtNativeExternalProcessAsyncOutput >> takeOutput [
 	^ GtNativeExternalProcessOutput fromNativeHandle: self primTakeOutput
 ]
+
+{ #category : #accessing }
+GtNativeExternalProcessAsyncOutput >> tryTakeOutput [
+	| aHandle |
+	
+	aHandle := self primTakeOutput.
+	^ aHandle isNull
+		ifTrue: [ nil ]
+		ifFalse: [ GtNativeExternalProcessOutput fromNativeHandle: aHandle ]
+]
