@@ -114,7 +114,7 @@ GtExternalProcessBuilder >> arguments: aCollection [
 ]
 
 { #category : #'api - spawning' }
-GtExternalProcessBuilder >> awaitOutput [
+GtExternalProcessBuilder >> asyncOutput [
 	"Returns a future that will spawn a child process and resolve an output.
 	The execution of the child process will only happen when the future is polled
 	for the first time.
