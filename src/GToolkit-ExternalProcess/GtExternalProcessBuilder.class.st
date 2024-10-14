@@ -113,6 +113,21 @@ GtExternalProcessBuilder >> arguments: aCollection [
 	self args: aCollection
 ]
 
+{ #category : #'api - spawning' }
+GtExternalProcessBuilder >> awaitOutput [
+	"Returns a future that will spawn a child process and resolve an output.
+	The execution of the child process will only happen when the future is polled
+	for the first time.
+	
+	By default, stdout and stderr are captured (and used to provide the
+	resulting output). Stdin is not inherited from the parent and any
+	attempt by the child process to read from the stdin stream will result
+	in the stream immediately closing."
+	<return: #TAsyncFuture>
+
+	^ GtExternalProcessOutputFuture forProcessBuilder: self
+]
+
 { #category : #'api - configuration' }
 GtExternalProcessBuilder >> clearEnv [
 	"Clears the entire environment map for the child process."
@@ -305,6 +320,12 @@ GtExternalProcessBuilder >> pipeStdout [
 	"A new pipe should be arranged to connect the standard output (stdout) handle of parent and child processes."
 
 	self stdout: GtExternalProcessPipedStdio new
+]
+
+{ #category : #copying }
+GtExternalProcessBuilder >> postCopy [
+	arguments := arguments copy.
+	environmentVariablesCommands := environmentVariablesCommands copy
 ]
 
 { #category : #'api - configuration' }
