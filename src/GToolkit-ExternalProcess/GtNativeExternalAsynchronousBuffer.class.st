@@ -95,3 +95,11 @@ GtNativeExternalAsynchronousBuffer >> primReleaseSignaller [
 GtNativeExternalAsynchronousBuffer >> releaseSemaphoreSignaller [
 	self primReleaseSignaller
 ]
+
+{ #category : #accessing }
+GtNativeExternalAsynchronousBuffer >> upToEnd [
+
+	^ String streamContents: [ :stream | | buf |
+		[ (buf := self pollString) isEmpty ] whileFalse:
+			[ stream nextPutAll: buf ] ]
+]
