@@ -58,6 +58,27 @@ GtExternalProcessBuilder class >> new: aProgram [
 ]
 
 { #category : #'api - configuration' }
+GtExternalProcessBuilder >> addAllEnvVariablesFromParentWithoutOverride [
+	"The user may have done an explicit set of a variable via #environmentAt:put: in which case
+	we do not want to override it with the inherit one.
+	This method allows to set all but overriden variables inherit from parent."
+	| existingEnvNames |
+
+	existingEnvNames := Set new.
+	environmentVariablesCommands do: [ :envCommand |
+		envCommand = #set ifTrue:
+			[ existingEnvNames add: envCommand value key ]
+		ifFalse: [ envCommand = #remove ifTrue:
+			[ existingEnvNames remove: envCommand value ifAbsent: [] ]
+		ifFalse: [ envCommand = #clear ifTrue:
+			[ existingEnvNames removeAll ]
+		ifFalse: [ self error: 'Unknown env command' ] ] ] ].
+	Smalltalk os environment asDictionary keysAndValuesDo: [ :key :value |
+		(existingEnvNames includes: key) ifFalse: 
+			[ self env: key value: value ] ].
+]
+
+{ #category : #'api - configuration' }
 GtExternalProcessBuilder >> arg: anArgumentString [
 	"Adds an argument to pass to the program.
 	Only one argument can be passed per use. So instead of:
