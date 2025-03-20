@@ -174,6 +174,16 @@ GtExternalProcessBuilder >> command: aProgram [
 	command := aProgram
 ]
 
+{ #category : #accessing }
+GtExternalProcessBuilder >> commandLine [
+	"Answer the string which is the equivalent command line of the receiver"
+
+	^ String streamContents: [ :stream |
+		{ command }, arguments
+			do: [ :arg | stream << arg asString ]
+			separatedBy: [ stream space ] ]
+]
+
 { #category : #private }
 GtExternalProcessBuilder >> createNativeCommand [
 	| anExternalCommand |
@@ -251,6 +261,16 @@ GtExternalProcessBuilder >> fileStdout: aFileReference [
 	"Set the child to redirect the standard output (stdout) into a file."
 
 	self stdout: (GtExternalProcessFileStdio new fileReference: aFileReference)
+]
+
+{ #category : #'as yet unclassified' }
+GtExternalProcessBuilder >> gtCommandLineFor: aView [
+	<gtView>
+
+	^ aView text
+		title: 'Command Line';
+		priority: 10;
+		text: [ self commandLine ]
 ]
 
 { #category : #'api - stdio' }
