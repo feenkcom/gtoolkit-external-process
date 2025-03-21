@@ -100,6 +100,8 @@ GtExternalProcessExamples >> pipeLargeFile [
 					args: {'-c'.
 							script};
 					output ].
+	self assert: anOutput status isSuccess
+		description: 'process terminated unsuccessfully'.
 	fileContents := file contents trimBoth.
 	stdout := anOutput stdout trimBoth.
 	self assert: stdout equals: fileContents.
