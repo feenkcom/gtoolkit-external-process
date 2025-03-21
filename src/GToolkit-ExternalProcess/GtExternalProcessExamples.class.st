@@ -1,8 +1,17 @@
 Class {
 	#name : #GtExternalProcessExamples,
 	#superclass : #Object,
+	#instVars : [
+		'file'
+	],
 	#category : #'GToolkit-ExternalProcess-Examples'
 }
+
+{ #category : #private }
+GtExternalProcessExamples >> cleanUp [
+
+	file ifNotNil: [ file ensureDelete ]
+]
 
 { #category : #examples }
 GtExternalProcessExamples >> defaultProcessBuilder [
@@ -53,6 +62,51 @@ GtExternalProcessExamples >> inheritedHelloWorld [
 		
 	self assert: stdout equals: ''.
 	
+	^ stdout
+]
+
+{ #category : #examples }
+GtExternalProcessExamples >> pipeLargeFile [
+	"Demonstrate piping the output of a process with large output"
+
+	<gtExample>
+	<after: #cleanUp>
+	| anOutput stdout fileContents isWindows |
+	file := FileReference newTempFilePrefix: 'pipeLargeFile-' suffix: '.txt'.
+	file ensureDelete.
+	file
+		writeStreamDo: [ :stream | stream nextPutAll: (String loremIpsum: 15 * (1024 ** 2)) ].
+	isWindows := OSPlatform current isWindows.
+	anOutput := isWindows
+			ifTrue: [ GtExternalProcessBuilder new
+					command: 'cmd';
+					args: {'/C'.
+							'type ' , file fullName};
+					output ]
+			ifFalse: [ | script |
+				script := String
+						streamContents: [ :stream | 
+							stream
+								<< 'cat ';
+								<< file fullName;
+								<< ';';
+								lf;
+								<< 'cat ';
+								<< file fullName;
+								<< ' >&2';
+								lf ].
+				GtExternalProcessBuilder new
+					command: 'sh';
+					args: {'-c'.
+							script};
+					output ].
+	fileContents := file contents trimBoth.
+	stdout := anOutput stdout trimBoth.
+	self assert: stdout equals: fileContents.
+	isWindows
+		ifFalse: [ | stderr |
+			stderr := anOutput stderr trimBoth.
+			self assert: stderr equals: fileContents ].
 	^ stdout
 ]
 
