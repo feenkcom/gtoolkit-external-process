@@ -8,7 +8,8 @@ Class {
 		'output',
 		'waker',
 		'externalProcessChild',
-		'processBuilder'
+		'processBuilder',
+		'mutex'
 	],
 	#classVars : [
 		'WaitFutures',
@@ -50,14 +51,15 @@ GtExternalProcessOutputFuture class >> newWaitProcess [
 
 { #category : #private }
 GtExternalProcessOutputFuture >> attemptToTakeOutput [
-	output ifNotNil: [ ^ true ].
+	mutex critical: [
+		output ifNotNil: [ ^ true ].
 	
-	output := asyncOutput tryTakeOutput.
-	^ output
-		ifNotNil: [
-			waker wakeUp.
-			true ]
-		ifNil: [ false ]
+		output := asyncOutput tryTakeOutput.
+		^ output
+			ifNotNil: [
+				waker wakeUp.
+				true ]
+			ifNil: [ false ] ]
 ]
 
 { #category : #initialization }
@@ -67,51 +69,50 @@ GtExternalProcessOutputFuture >> initialize [
 	waker := AsyncFutureExecutionAtomicWaker new.
 	asyncOutput := nil.
 	output := nil.
+	mutex := AsyncDeadlockSafeMonitor new
 ]
 
 { #category : #'api - future' }
 GtExternalProcessOutputFuture >> poll: anAsynchronousContext [
 	<return: #AsyncPoll>
 	
-	externalProcessChild ifNil: [
+	mutex critical: [
+		externalProcessChild ifNil: [
 		externalProcessChild := processBuilder copy
 			pipeStdout;
 			pipeStderr;
 			spawn ].
 
-	asyncOutput ifNil: [
-		| aSemaphoreSignaller anAsyncOutput |
+		asyncOutput ifNil: [
+			| aSemaphoreSignaller anAsyncOutput |
 	
-		aSemaphoreSignaller := externalProcessChild primitiveGetSemaphoreSignaller.
-		aSemaphoreSignaller isNull
-			ifTrue: [ self error: 'Semaphore signaller is not available in the current virtual machine.' ].
+			aSemaphoreSignaller := externalProcessChild primitiveGetSemaphoreSignaller.
+			aSemaphoreSignaller isNull
+				ifTrue: [ self error: 'Semaphore signaller is not available in the current virtual machine.' ].
 		
-		anAsyncOutput := GtNativeExternalProcessAsyncOutput
-			fromNativeHandle: (externalProcessChild
-				primAsyncWaitWithOutputSignaller: aSemaphoreSignaller
-				semaphoreIndex: WaitSemaphoreIndex).
+			anAsyncOutput := GtNativeExternalProcessAsyncOutput
+				fromNativeHandle: (externalProcessChild
+					primAsyncWaitWithOutputSignaller: aSemaphoreSignaller
+					semaphoreIndex: WaitSemaphoreIndex).
 
-		asyncOutput := anAsyncOutput.
+			asyncOutput := anAsyncOutput.
 		
-		WaitMutex critical: [
-			WaitFutures add: self.
-			WaitProcess ifNil: [
-				WaitProcess := [
+			WaitMutex critical: [
+				WaitFutures add: self.
+				WaitProcess ifNil: [
+					WaitProcess := [
 						self class newWaitProcess
 					] newProcess
 					name: 'External process output futures';
 					priority: Processor userInterruptPriority;
-					resume.
-			
-			].
-		]
-	].
-	
+					resume ] ] ].
+
 	^ output
 		ifNil: [
 			waker register: anAsynchronousContext waker.
 			AsyncPoll pending ]
 		ifNotNil: [ :anOutput | AsyncPoll ready: anOutput ]	
+	]
 ]
 
 { #category : #'api - future copy' }
