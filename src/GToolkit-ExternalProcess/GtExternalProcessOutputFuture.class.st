@@ -29,7 +29,7 @@ GtExternalProcessOutputFuture class >> forProcessBuilder: aGtExternalProcessBuil
 
 { #category : #'class initialization' }
 GtExternalProcessOutputFuture class >> initialize [
-	WaitMutex := Monitor new.
+	WaitMutex := Mutex new.
 	WaitSemaphore := Semaphore new.
 	WaitSemaphoreIndex := Smalltalk registerExternalObject: WaitSemaphore.
 	WaitFutures := OrderedCollection new.
