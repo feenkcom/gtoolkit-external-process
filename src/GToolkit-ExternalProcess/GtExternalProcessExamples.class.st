@@ -16,52 +16,49 @@ GtExternalProcessExamples >> cleanUp [
 { #category : #examples }
 GtExternalProcessExamples >> defaultProcessBuilder [
 	<gtExample>
+	<return: #GtExternalProcessBuilder>
 	| aProcessBuilder |
-	
-	aProcessBuilder := GtExternalProcessBuilder new
-		command: 'date'.
-		
+	aProcessBuilder := GtExternalProcessBuilder new command: 'date'.
+
 	^ aProcessBuilder
 ]
 
 { #category : #examples }
 GtExternalProcessExamples >> echoHello [
 	<gtExample>
+	<return: #ByteString>
 	| anOutput anStdout |
-	
 	anOutput := OSPlatform current isWindows
-		ifTrue: [
-			GtExternalProcessBuilder new
-				command: 'cmd';
-				args: #('/C' 'echo hello');
-				output ]
-		ifFalse: [ 
-			GtExternalProcessBuilder new
-				command: 'sh';
-				args: #('-c' 'echo hello');
-				output ].
+			ifTrue: [ GtExternalProcessBuilder new
+					command: 'cmd';
+					args: #('/C' 'echo hello');
+					output ]
+			ifFalse: [ GtExternalProcessBuilder new
+					command: 'sh';
+					args: #('-c' 'echo hello');
+					output ].
 
 	anStdout := anOutput stdout trimBoth.
 	self assert: anStdout equals: 'hello'.
-	
+
 	^ anStdout
 ]
 
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> inheritedHelloWorld [
 	<gtExample>
+	<return: #ByteString>
 	| output stdout |
-
 	output := GtExternalProcessBuilder new
-		command: 'echo';
-		arg: 'hello world';
-		inheritStdout;
-		output.
+			command: 'echo';
+			arg: 'hello world';
+			inheritStdout;
+			output.
 
 	stdout := output stdout trimBoth.
-		
+
 	self assert: stdout equals: ''.
-	
+
 	^ stdout
 ]
 
@@ -71,6 +68,7 @@ GtExternalProcessExamples >> pipeLargeFile [
 
 	<gtExample>
 	<after: #cleanUp>
+	<return: #ByteString>
 	| anOutput stdout fileContents isWindows |
 	file := FileReference newTempFilePrefix: 'pipeLargeFile-' suffix: '.txt'.
 	file ensureDelete.
@@ -100,7 +98,8 @@ GtExternalProcessExamples >> pipeLargeFile [
 					args: {'-c'.
 							script};
 					output ].
-	self assert: anOutput status isSuccess
+	self
+		assert: anOutput status isSuccess
 		description: 'process terminated unsuccessfully'.
 	fileContents := file contents trimBoth.
 	stdout := anOutput stdout trimBoth.
@@ -115,24 +114,23 @@ GtExternalProcessExamples >> pipeLargeFile [
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> pipeStdoutToStdin [
 	<gtExample>
+	<return: #ByteString>
 	| parent output stdout |
-	
-	OSPlatform current isWindows
-		ifTrue: [ ^ '' ].
+	OSPlatform current isWindows ifTrue: [ ^ '' ].
 
 	parent := (GtExternalProcessBuilder new: 'echo')
-		arg: 'hello';
-		pipeStdout;
-		spawn.
+			arg: 'hello';
+			pipeStdout;
+			spawn.
 
 	output := (GtExternalProcessBuilder new: 'wc')
-		arg: '-m';
-		stdoutToStdin: parent;
-		output.
+			arg: '-m';
+			stdoutToStdin: parent;
+			output.
 
 	stdout := output stdoutString trimBoth.
 	self assert: stdout equals: '6'.
-	
+
 	^ stdout
 ]
 
@@ -184,16 +182,15 @@ GtExternalProcessExamples >> setAndEchoEnvVar [
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> stdoutStream [
 	<gtExample>
+	<return: #Array>
 	| process lines |
-	
-	OSPlatform current isWindows
-		ifTrue: [ ^ #() ].
-	
+	OSPlatform current isWindows ifTrue: [ ^ #() ].
+
 	process := GtExternalProcessBuilder new
-		command: 'echo';
-		arg: 'hello world';
-		pipeStdout;
-		spawn.
+			command: 'echo';
+			arg: 'hello world';
+			pipeStdout;
+			spawn.
 
 	lines := process stdoutStream lines toArray wait.
 	self assert: lines size equals: 1.
@@ -205,24 +202,23 @@ GtExternalProcessExamples >> stdoutStream [
 { #category : #'examples - stdio' }
 GtExternalProcessExamples >> writeToStdin [
 	<gtExample>
+	<return: #ByteString>
 	| process stdout |
-	
-	OSPlatform current isWindows
-		ifTrue: [ ^ '' ].
+	OSPlatform current isWindows ifTrue: [ ^ '' ].
 
 	process := (GtExternalProcessBuilder new: 'wc')
-		arg: '-c';
-		pipeStdin;
-		pipeStdout;
-		spawn.
+			arg: '-c';
+			pipeStdin;
+			pipeStdout;
+			spawn.
 
 	process stdin
 		nextPutAll: 'hello';
 		close.
 
 	stdout := process waitWithOutput stdout trimBoth.
-		
+
 	self assert: stdout equals: '5'.
-	
+
 	^ stdout
 ]
