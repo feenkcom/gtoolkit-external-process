@@ -41,6 +41,14 @@ GtNativeExternalAsynchronousBuffer >> pollString [
 
 { #category : #'api - buffer' }
 GtNativeExternalAsynchronousBuffer >> pollStringEvery: aDuration do: aBlock [
+	^ self
+		pollStringEvery: aDuration
+		do: aBlock
+		onExit: [  ]
+]
+
+{ #category : #'api - buffer' }
+GtNativeExternalAsynchronousBuffer >> pollStringEvery: aDuration do: aBlock onExit: anExitBlock [
 	^ [ 
 		| shouldStop |
 		
@@ -56,7 +64,8 @@ GtNativeExternalAsynchronousBuffer >> pollStringEvery: aDuration do: aBlock [
 				ifNotEmpty: [ :aString | 
 					aBlock value: aString ].
 			aDuration wait ].
-	] fork
+		anExitBlock value.
+	] forkNamed: self class name asString, ' pollString'
 ]
 
 { #category : #'api - buffer' }
