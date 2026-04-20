@@ -16,7 +16,7 @@ BaselineOfGToolkitExternalProcess >> baseline: spec [
 				spec repository: 'github://feenkcom/gtoolkit-boxer:v0.8.60/boxer-bindings' ].
 		spec
 			baseline: 'GToolkitExamplesEngine' with: [
-				spec repository: 'github://feenkcom/gtoolkit-examples:v0.8.130/src' ].
+				spec repository: 'github://feenkcom/gtoolkit-examples:v0.8.131/src' ].
 
 		spec package: 'GToolkit-ExternalProcess' with: [
 			spec requires: #(#GToolkitBoxer #GToolkitExamplesEngine) ].
